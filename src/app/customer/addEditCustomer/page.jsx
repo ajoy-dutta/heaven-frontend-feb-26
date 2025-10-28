@@ -168,37 +168,37 @@ export default function AddEditCustomerPage() {
   };
 
   const handleKeyDown = (e) => {
-  if (e.key === "Enter") {
-    // Detect if inside an open react-select menu
-    const selectMenuOpen = document.querySelector(".react-select__menu");
-    if (selectMenuOpen) return; // Let Enter work inside select menu
+    if (e.key === "Enter") {
+      // Detect if inside an open react-select menu
+      const selectMenuOpen = document.querySelector(".react-select__menu");
+      if (selectMenuOpen) return; // Let Enter work inside select menu
 
-    e.preventDefault(); // Prevent form submission
+      e.preventDefault(); // Prevent form submission
 
-    const form = e.target.form;
-    const elements = Array.from(form.elements);
+      const form = e.target.form;
+      const elements = Array.from(form.elements);
 
-    const index = elements.indexOf(e.target);
-    let nextElement = null;
+      const index = elements.indexOf(e.target);
+      let nextElement = null;
 
-    for (let i = index + 1; i < elements.length; i++) {
-      const el = elements[i];
-      if (
-        el.offsetParent !== null &&
-        !el.disabled &&
-        el.type !== "hidden" &&
-        el.tagName !== "BUTTON"
-      ) {
-        nextElement = el;
-        break;
+      for (let i = index + 1; i < elements.length; i++) {
+        const el = elements[i];
+        if (
+          el.offsetParent !== null &&
+          !el.disabled &&
+          el.type !== "hidden" &&
+          el.tagName !== "BUTTON"
+        ) {
+          nextElement = el;
+          break;
+        }
+      }
+
+      if (nextElement) {
+        nextElement.focus();
       }
     }
-
-    if (nextElement) {
-      nextElement.focus();
-    }
-  }
-};
+  };
 
 
   const renderField = (name, label, type = "text", required = false, placeholder = "") => (
@@ -221,85 +221,118 @@ export default function AddEditCustomerPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
-        {isEditMode ? "Edit Customer" : "Add Customer"}
+    <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md">
+      <h2 className="text-3xl font-bold mb-8 text-center text-sky-800 tracking-wide">
+        {isEditMode ? "✏️ Edit Customer" : "🧾 Add New Customer"}
       </h2>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {renderField("customerName", "Customer Name", "text", true)}
-          {renderField("dob", "Date of Birth", "date")}
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Card Container */}
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+          <h3 className="text-lg font-semibold mb-4 text-sky-700 flex items-center gap-2">
+            <span className="w-1 h-5 bg-sky-700 rounded"></span> Customer Information
+          </h3>
 
-          <div className="flex flex-col">
-            <label className="text-sm mb-1 font-medium">
-              District <span className="text-red-500">*</span>
-            </label>
-            <Select
-              name="district"
-              value={formData.district}
-              onChange={(selected) => {
-                setFormData(prev => ({ ...prev, district: selected }));
-                if (errors.district) setErrors(prev => ({ ...prev, district: "" }));
-              }}
-              options={districts}
-              isClearable
-              placeholder="Select district"
-              onKeyDown={handleKeyDown}
-            />
-            {errors.district && <span className="text-red-500 text-xs mt-1">{errors.district}</span>}
+          {/* Input Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            {renderField("customerName", "Customer Name", "text", true)}
+            {renderField("dob", "Date of Birth", "date")}
+
+            {/* District */}
+            <div className="flex flex-col">
+              <label className="text-sm mb-1 font-semibold text-gray-700">
+                District <span className="text-red-500">*</span>
+              </label>
+              <Select
+                name="district"
+                value={formData.district}
+                onChange={(selected) => {
+                  setFormData((prev) => ({ ...prev, district: selected }));
+                  if (errors.district) setErrors((prev) => ({ ...prev, district: "" }));
+                }}
+                options={districts}
+                isClearable
+                placeholder="Select district"
+                classNamePrefix="react-select"
+                onKeyDown={handleKeyDown}
+              />
+              {errors.district && (
+                <span className="text-red-500 text-xs mt-1">{errors.district}</span>
+              )}
+            </div>
+
+            {/* Customer Type */}
+            <div className="flex flex-col">
+              <label className="text-sm mb-1 font-semibold text-gray-700">
+                Customer Type <span className="text-red-500">*</span>
+              </label>
+              <Select
+                name="customerType"
+                value={
+                  formData.customerType
+                    ? { label: formData.customerType, value: formData.customerType }
+                    : null
+                }
+                onChange={(selected) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    customerType: selected?.value || "",
+                  }));
+                  if (errors.customerType)
+                    setErrors((prev) => ({ ...prev, customerType: "" }));
+                }}
+                options={customerTypes.map((t) => ({ value: t, label: t }))}
+                isClearable
+                placeholder="Select type"
+                classNamePrefix="react-select"
+                onKeyDown={handleKeyDown}
+              />
+              {errors.customerType && (
+                <span className="text-red-500 text-xs mt-1">{errors.customerType}</span>
+              )}
+            </div>
+
+            {/* Other Fields */}
+            {renderField("shopName", "Shop Name")}
+            {renderField("phone1", "Phone 1", "tel", true)}
+            {renderField("phone2", "Phone 2", "tel")}
+            {renderField("email", "E-mail Id", "email")}
+            {renderField("address", "Address", "text", true)}
+            {renderField("nid", "NID No")}
+            {renderField("courierName", "Courier Name")}
+            {renderField("previousDue", "Previous Due Amount", "number", false, "0.00")}
+            {renderField("remarks", "Remarks")}
           </div>
-
-          <div className="flex flex-col">
-            <label className="text-sm mb-1 font-medium">
-              Customer Type <span className="text-red-500">*</span>
-            </label>
-            <Select
-              name="customerType"
-              value={formData.customerType ? { label: formData.customerType, value: formData.customerType } : null}
-              onChange={(selected) => {
-                setFormData(prev => ({ ...prev, customerType: selected?.value || "" }));
-                if (errors.customerType) setErrors(prev => ({ ...prev, customerType: "" }));
-              }}
-              options={customerTypes.map(t => ({ value: t, label: t }))}
-              isClearable
-              placeholder="Select type"
-              onKeyDown={handleKeyDown}
-            />
-            {errors.customerType && <span className="text-red-500 text-xs mt-1">{errors.customerType}</span>}
-          </div>
-
-          {renderField("shopName", "Shop Name")}
-          {renderField("phone1", "Phone 1", "tel", true)}
-          {renderField("phone2", "Phone 2", "tel")}
-          {renderField("email", "E-mail Id", "email")}
-          {renderField("address", "Address", "text", true)}
-          {renderField("nid", "NID No")}
-          {renderField("courierName", "Courier Name")}
-          {renderField("previousDue", "Previous Due Amount", "number", false, "0.00")}
-          {renderField("remarks", "Remarks")}
         </div>
 
-        <div className="flex justify-center mt-8 gap-4">
+        {/* Action Buttons */}
+        <div className="flex justify-center mt-8 gap-6">
           <button
             type="button"
             onClick={handleReset}
-            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
+            className="bg-gray-500 text-white px-8 py-2.5 rounded-full hover:bg-gray-600 shadow transition-all duration-200 disabled:opacity-50"
             disabled={isSubmitting}
           >
-            Reset
+            🔄 Reset
           </button>
+
           <button
             type="submit"
-            className={`px-6 py-2 rounded text-white transition-colors ${
-              isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-sky-800 hover:bg-sky-700"
-            }`}
+            className={`px-8 py-2.5 rounded-full text-white font-medium shadow transition-all duration-200 ${isSubmitting
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-sky-700 hover:bg-sky-800"
+              }`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : isEditMode ? "Update" : "Submit"}
+            {isSubmitting
+              ? "Processing..."
+              : isEditMode
+                ? "💾 Update Customer"
+                : "✅ Submit Customer"}
           </button>
         </div>
       </form>
     </div>
+
   );
 }

@@ -91,102 +91,119 @@ export default function CustomerListPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4 text-center">Customer List</h2>
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* Heading */}
+      <h2 className="text-3xl font-bold mb-6 text-center text-sky-800 tracking-wide">
+        🧾 Customer Management
+      </h2>
 
-      {/* Add Customer Button */}
-      {/* <div className="flex justify-end mb-4">
-        <button
-          onClick={() => router.push("/customer/addEditCustomer")}
-          className="bg-sky-800 text-white px-4 py-2 rounded hover:bg-sky-700 transition-colors"
-        >
-          Add New Customer
-        </button>
-      </div> */}
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4 justify-center">
-        <Select
-          options={districts}
-          value={selectedDistrict}
-          onChange={(selected) => {
-            setSelectedDistrict(selected);
-            setCurrentPage(1);
-          }}
-          isClearable
-          placeholder="Select District"
-          className="w-48"
-        />
-        <Select
-          options={customerTypes}
-          value={selectedType}
-          onChange={(selected) => {
-            setSelectedType(selected);
-            setCurrentPage(1);
-          }}
-          isClearable
-          placeholder="Customer Type"
-          className="w-48"
-        />
-        <input
-          type="text"
-          placeholder="Search by name or shop..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="border px-3 py-1 rounded w-64"
-        />
+      {/* Filters Section */}
+      <div className="bg-white shadow-md rounded-2xl p-5 mb-6 border border-gray-200">
+        <h3 className="text-lg font-semibold mb-3 text-gray-700 text-center">
+          🔍 Filter Customers
+        </h3>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Select
+            options={districts}
+            value={selectedDistrict}
+            onChange={(selected) => {
+              setSelectedDistrict(selected);
+              setCurrentPage(1);
+            }}
+            isClearable
+            placeholder="Select District"
+            className="w-48"
+          />
+          <Select
+            options={customerTypes}
+            value={selectedType}
+            onChange={(selected) => {
+              setSelectedType(selected);
+              setCurrentPage(1);
+            }}
+            isClearable
+            placeholder="Customer Type"
+            className="w-48"
+          />
+          <input
+            type="text"
+            placeholder="Search by name or shop..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="border border-gray-300 px-3 py-2 rounded-lg shadow-sm w-64 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+          />
+        </div>
       </div>
 
+      {/* Loading Spinner */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <span className="loading loading-ring loading-xl"></span>
+          <span className="loading loading-ring loading-xl text-sky-600"></span>
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto border border-gray-300 rounded">
+          {/* Customer Table */}
+          <div className="overflow-x-auto bg-white shadow-lg rounded-2xl border border-gray-200">
             <table className="min-w-full border-collapse text-center">
-              <thead className="bg-sky-800 text-white">
+              <thead className="bg-gradient-to-r from-sky-700 to-sky-500 text-white">
                 <tr>
-                  <th className="p-2 border">#</th>
-                  <th className="p-2 border">Customer Name</th>
-                  <th className="p-2 border">Shop Name</th>
-                  <th className="p-2 border">Phone</th>
-                  <th className="p-2 border">District</th>
-                  <th className="p-2 border">Type</th>
-                  <th className="p-2 border">Previous Due</th>
-                  <th className="p-2 border">Actions</th>
+                  {[
+                    "#",
+                    "Customer Name",
+                    "Shop Name",
+                    "Phone",
+                    "District",
+                    "Type",
+                    "Previous Due",
+                    "Actions",
+                  ].map((head) => (
+                    <th key={head} className="p-3 border border-sky-600 text-sm">
+                      {head}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((c, idx) => (
-                    <tr key={c.id} className="border-t">
-                      <td className="p-2 border">
+                    <tr
+                      key={c.id}
+                      className="border-t hover:bg-sky-50 transition-all duration-150"
+                    >
+                      <td className="p-3 border">
                         {(currentPage - 1) * pageSize + idx + 1}
                       </td>
-                      <td className="p-2 border">{c.customer_name}</td>
-                      <td className="p-2 border">{c.shop_name || "-"}</td>
-                      <td className="p-2 border">{c.phone1}</td>
-                      <td className="p-2 border">{c.district || "-"}</td> {/* সরাসরি নাম দেখাচ্ছি */}
-                      <td className="p-2 border">{c.customer_type}</td>
-                      <td className="p-2 border">
+                      <td className="p-3 border font-semibold text-gray-700">
+                        {c.customer_name}
+                      </td>
+                      <td className="p-3 border text-gray-600">
+                        {c.shop_name || "-"}
+                      </td>
+                      <td className="p-3 border text-gray-700">{c.phone1}</td>
+                      <td className="p-3 border text-gray-700">
+                        {c.district || "-"}
+                      </td>
+                      <td className="p-3 border text-gray-700">
+                        {c.customer_type}
+                      </td>
+                      <td className="p-3 border text-gray-700 font-medium">
                         {c.previous_due_amount
                           ? Number(c.previous_due_amount).toFixed(2)
                           : "0.00"}
                       </td>
-                      <td className="p-2 border space-x-2">
+                      <td className="p-3 border space-x-2">
                         <button
                           onClick={() => handleEdit(c)}
-                          className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                          className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition-all"
                         >
                           Edit
                         </button>
                         <button
-                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                           onClick={() => handleDelete(c.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all"
                         >
                           Delete
                         </button>
@@ -195,7 +212,10 @@ export default function CustomerListPage() {
                   ))
                 ) : (
                   <tr>
-                    <td className="p-2" colSpan={8}>
+                    <td
+                      colSpan={8}
+                      className="p-5 text-gray-500 italic bg-gray-50"
+                    >
                       No customers found.
                     </td>
                   </tr>
@@ -206,48 +226,48 @@ export default function CustomerListPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <nav
-              className="flex justify-center mt-4 space-x-2"
-              aria-label="Pagination"
-            >
+            <div className="flex justify-center mt-6 space-x-2">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className={`px-3 py-1 rounded border ${currentPage === 1
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-white hover:bg-gray-100"
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${currentPage === 1
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
                   }`}
               >
-                Previous
+                ◀ Previous
               </button>
+
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 rounded border ${currentPage === i + 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-white hover:bg-gray-100"
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${currentPage === i + 1
+                      ? "bg-sky-600 text-white border-sky-600"
+                      : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
                     }`}
                 >
                   {i + 1}
                 </button>
               ))}
+
               <button
                 onClick={() =>
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded border ${currentPage === totalPages
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-white hover:bg-gray-100"
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${currentPage === totalPages
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
                   }`}
               >
-                Next
+                Next ▶
               </button>
-            </nav>
+            </div>
           )}
         </>
       )}
     </div>
+
   );
 }

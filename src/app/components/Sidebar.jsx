@@ -120,9 +120,8 @@ function SidebarContent() {
       label: "Bank Account",
       icon: "⚙️",
       children: [
-        { label: "Account Category Master", href: "/bank/account-category" },
-        { label: "Bank Account Master", href: "/bank/account-master" },
-        { label: "Bank Account List", href: "/bank/account-list" }
+        { label: "Bank Account Master", href: "/bankAccount/account-master" },
+        { label: "Bank Account List", href: "/bankAccount/accountList" }
       ]
     },
     {
