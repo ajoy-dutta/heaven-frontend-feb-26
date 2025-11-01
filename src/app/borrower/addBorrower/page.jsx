@@ -138,10 +138,10 @@ const AddBorrowerPage = () => {
                     />
                 </div>
 
-                <div className="col-span-4 text-center">
+                <div className="col-span-4 text-center cursor-pointer">
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                        className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer transition"
                     >
                         {borrowerId ? "Update Borrower" : "Add Borrower"}
                     </button>
