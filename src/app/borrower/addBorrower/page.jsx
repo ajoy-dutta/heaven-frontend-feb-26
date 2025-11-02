@@ -18,7 +18,7 @@ const AddBorrowerPage = () => {
         due_amount: "",
     });
 
-    // ✅ Fetch borrborrowerr details if editing
+ 
     useEffect(() => {
         if (borrowerId) {
             const fetchBorrower = async () => {
