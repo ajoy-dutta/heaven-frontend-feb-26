@@ -43,7 +43,7 @@ const BorrowerListPage = () => {
         <h1 className="text-3xl font-bold text-gray-800">Borrowers List</h1>
         <button
           onClick={() => router.push("/borrower/addBorrower")}
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-5 py-2 cursor-pointer rounded-lg hover:bg-blue-700 transition"
         >
           Add Borrower
         </button>
@@ -91,13 +91,13 @@ const BorrowerListPage = () => {
                 <td className="px-6 py-4 text-right space-x-2">
                   <button
                     onClick={() => router.push(`/borrower/addBorrower?id=${borrower.id}`)}
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition cursor-pointer"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(borrower.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition cursor-pointer"
                   >
                     Delete
                   </button>
