@@ -4,7 +4,6 @@ import React from "react";
 import SidebarContent from "./Sidebar";
 import ProtectedRoute from "../provider/ProtectedRoute";
 import { usePathname } from "next/navigation";
-
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 
@@ -12,6 +11,7 @@ export default function ClientLayout({ children }) {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isBrandpage = pathname === "/brands"
+  const isLoginPage = pathname === "/authentication";
   
   const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
 
