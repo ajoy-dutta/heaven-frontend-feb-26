@@ -54,24 +54,7 @@ export default function ClientLayout({ children }) {
 
   if (
     isHomePage ||
-    isHonorboard ||
-    isStudent ||
-    isTeachers ||
-    isResult ||
-    isNotice ||
-    isPhotoGallery ||
-    isAlumni ||
-    isAbout ||
-    isHistoricalPlace ||
-    isCollegeHistory ||
-    isOfficeOfPrincipal ||
-    isOfficeOfVicePrinciple ||
-    isCollegeLocation ||
-    isFormalPrincipal ||
-    isFormalVicePrincipal ||
-    isNotableAlumni ||
-    isCitizenCharter ||
-    isFormerFaculty
+    
     
   ) {
     return (
