@@ -1,16 +1,13 @@
+// app/expense/page.js
 "use client";
 import React, { useEffect, useState } from "react";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { toast } from "react-hot-toast";
 import { FaFilePdf, FaSearch } from "react-icons/fa";
+import PayReceipt from "./PaymentReceipt";
+
 
 const ExpensePage = () => {
-  const [formData, setFormData] = useState({
-    category: "",
-    amount: "",
-    description: "",
-  });
-
   const [filters, setFilters] = useState({
     from_date: "",
     to_date: "",
@@ -19,6 +16,7 @@ const ExpensePage = () => {
     cost_category: "",
   });
 
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expenses, setExpenses] = useState([]);
 
   // ✅ Fetch all expenses
@@ -35,31 +33,13 @@ const ExpensePage = () => {
     fetchExpenses();
   }, []);
 
-  // ✅ Submit new expense
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await AxiosInstance.post("add-expense/", formData);
-      toast.success("Expense added!");
-      setFormData({ category: "", amount: "", description: "" });
-      fetchExpenses();
-    } catch (err) {
-      toast.error("Error adding expense");
-    }
-  };
-
-  // ✅ Download PDF
-  const handleDownloadPDF = (id) => {
-    const pdfUrl = `${AxiosInstance.defaults.baseURL}add-expense/${id}/pdf/`;
-    window.open(pdfUrl, "_blank");
-  };
-
   // ✅ Apply filters
   const handleSearch = (e) => {
     e.preventDefault();
     fetchExpenses(filters);
   };
 
+  
   return (
     <div className="p-6 space-y-8 bg-gray-100 min-h-screen">
       {/* 🌿 Header */}
@@ -99,7 +79,7 @@ const ExpensePage = () => {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Receipt No*</label>
+            <label className="block mb-1 font-medium text-gray-700">Receipt No</label>
             <input
               type="text"
               placeholder="Enter Receipt No"
@@ -110,7 +90,7 @@ const ExpensePage = () => {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Account Title*</label>
+            <label className="block mb-1 font-medium text-gray-700">Account Title</label>
             <input
               type="text"
               placeholder="Enter Account Title"
@@ -121,7 +101,7 @@ const ExpensePage = () => {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Cost Category*</label>
+            <label className="block mb-1 font-medium text-gray-700">Cost Category</label>
             <input
               type="text"
               placeholder="Enter Cost Category"
@@ -190,13 +170,12 @@ const ExpensePage = () => {
                   <td className="border px-2 py-1">{exp.remarks || "-"}</td>
                   <td className="border px-2 py-1">
                     <button
-                      onClick={() => handleDownloadPDF(exp.id)}
-                      className="bg-rose-400 text-white p-1.5 rounded hover:bg-rose-500 transition"
-                      title="Download PDF"
+                    onClick={() => setSelectedReceipt(exp)}
+                    className="text-blue-600 hover:underline cursor-pointer"
                     >
-                      <FaFilePdf />
+                    Voucher
                     </button>
-                  </td>
+                </td>
                 </tr>
               ))
             ) : (
@@ -209,6 +188,23 @@ const ExpensePage = () => {
           </tbody>
         </table>
       </div>
+
+     {/* Render PayReceipt if selected */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <PayReceipt receiptData={selectedReceipt} />
+            <button
+              onClick={() => setSelectedReceipt(null)}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };
