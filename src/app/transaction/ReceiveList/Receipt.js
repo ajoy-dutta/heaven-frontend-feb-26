@@ -1,5 +1,5 @@
 // utils/pdfGenerator.js
-export const generateReceiptPDF = async (receiptData) => {
+export const generateReceiptPDF = async (receiptData, voucherType = "Receive") => {
   try {
     const { jsPDF } = await import('jspdf');
     
@@ -41,16 +41,27 @@ export const generateReceiptPDF = async (receiptData) => {
     yPosition += 10;
 
     // Receipt Title
+    let voucherTitle;
+    let receiptNoText;
+    
+    if (voucherType === "Payment") {
+      voucherTitle = 'PAYMENT VOUCHER';
+      receiptNoText = 'Payment No';
+    } else {
+      voucherTitle = 'RECEIVE VOUCHER';
+      receiptNoText = 'Receipt No';
+    }
+
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('RECEIVE RECEIPT', 105, yPosition, { align: 'center' });
+    pdf.text(voucherTitle, 105, yPosition, { align: 'center' });
     yPosition += 10;
 
     // Date and Receipt No
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
     pdf.text(`Date: ${new Date(receiptData.date).toLocaleDateString('en-GB')}`, margin, yPosition);
-    pdf.text(`Receipt No: ${receiptData.receiptNo}`, 200 - margin, yPosition, { align: 'right' });
+    pdf.text(`${receiptNoText}: ${receiptData.receiptNo || 'N/A'}`, 200 - margin, yPosition, { align: 'right' });
     yPosition += 8;
 
     // Table Header
@@ -173,19 +184,11 @@ export const generateReceiptPDF = async (receiptData) => {
     })}`;
     pdf.text(footerText, 200 - margin, yPosition, { align: 'right' });
 
+    // Generate custom filename
+    const fileName = `${receiptData.voucherNo}_${voucherType}.pdf`;
 
-
-     // Generate PDF with simple receipt number filename
-    const fileName = `${receiptData.voucherNo}.pdf`;
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, '_blank');
-    downloadLink.href = pdfUrl;
-    downloadLink.download = fileName;
-   
-    
-    // Clean up
-    setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+    // Direct download without opening in new tab
+    pdf.save(fileName);
 
     return true;
   } catch (error) {

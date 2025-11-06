@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { toast } from "react-hot-toast";
-import { FaFilePdf, FaSearch } from "react-icons/fa";
-import PayReceipt from "./PaymentReceipt";
+import { FaSearch } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 
 const ExpensePage = () => {
@@ -15,9 +15,8 @@ const ExpensePage = () => {
     account_title: "",
     cost_category: "",
   });
-
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expenses, setExpenses] = useState([]);
+  const router = useRouter();
 
   // ✅ Fetch all expenses
   const fetchExpenses = async (params = {}) => {
@@ -37,6 +36,12 @@ const ExpensePage = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     fetchExpenses(filters);
+  };
+
+
+   // ✅ Generate and open PDF in new tab
+ const handleVoucher = (id) => {
+    router.push(`/transaction/paymentList/${id}`);
   };
 
   
@@ -133,7 +138,6 @@ const ExpensePage = () => {
             <tr className="bg-gray-600 text-white font-semibold">
               <th className="border px-2 py-1">SL</th>
               <th className="border px-2 py-1">Date</th>
-              <th className="border px-2 py-1">Receipt No</th>
               <th className="border px-2 py-1">Voucher No</th>
               <th className="border px-2 py-1">Account Title</th>
               <th className="border px-2 py-1">Cost Category</th>
@@ -158,7 +162,6 @@ const ExpensePage = () => {
                   <td className="border px-2 py-1">
                     {new Date(exp.date).toLocaleDateString("en-GB")}
                   </td>
-                  <td className="border px-2 py-1">{exp.receiptNo || "-"}</td>
                   <td className="border px-2 py-1">{exp.voucherNo}</td>
                   <td className="border px-2 py-1">{exp.accountTitle}</td>
                   <td className="border px-2 py-1">{exp.costCategory}</td>
@@ -169,11 +172,10 @@ const ExpensePage = () => {
                   </td>
                   <td className="border px-2 py-1">{exp.remarks || "-"}</td>
                   <td className="border px-2 py-1">
-                    <button
-                    onClick={() => setSelectedReceipt(exp)}
-                    className="text-blue-600 hover:underline cursor-pointer"
-                    >
-                    Voucher
+                    <button 
+                        onClick={() => handleVoucher(exp.id)} 
+                        className="bg-blue-500 px-1 py-1 rounded text-white hover:bg-blue-600 cursor-pointer">
+                        Voucher
                     </button>
                   </td>
                 </tr>
@@ -188,26 +190,6 @@ const ExpensePage = () => {
           </tbody>
         </table>
       </div>
-
-     {/* Render PayReceipt if selected */}
-      {selectedReceipt && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-lg max-w-4xl max-h-[90vh] overflow-auto">
-            <div className="flex justify-between items-center p-4 border-b">
-                <h3 className="text-lg font-semibold">Receipt Details</h3>
-                <button
-                onClick={() => setSelectedReceipt(null)}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                Close
-                </button>
-            </div>
-            <div className="p-4">
-                <PaymentVoucherPage receiptData={selectedReceipt} />
-            </div>
-            </div>
-        </div>
-        )}
     </div>
   );
 };

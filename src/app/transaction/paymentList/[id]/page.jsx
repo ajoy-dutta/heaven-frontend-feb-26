@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { generateReceiptPDF } from '../Receipt';
+import { generateReceiptPDF } from '../../ReceiveList/Receipt';
 import AxiosInstance from '@/app/components/AxiosInstance';
 
 
@@ -13,7 +13,7 @@ export default function VoucherPage() {
 
   useEffect(() => {
     if (id) {
-      AxiosInstance.get(`add-income/${id}/`)
+      AxiosInstance.get(`add-expense/${id}/`)
         .then((res) => {
           console.log(res.data);
           setReceiptData(res.data);
@@ -30,7 +30,7 @@ export default function VoucherPage() {
   const handleDownload = async () => {
     if (receiptData) {
       try {
-        await generateReceiptPDF(receiptData);
+        await generateReceiptPDF(receiptData, "Payment");
       } catch (error) {
         console.error('Download failed:', error);
         setError('Failed to download PDF');

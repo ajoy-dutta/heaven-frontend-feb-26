@@ -4,7 +4,6 @@ import AxiosInstance from "@/app/components/AxiosInstance";
 import { toast } from "react-hot-toast";
 import { FaFilePdf, FaSearch } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { generateReceiptPDF } from "./ReceiveReceipt";
 
 
 const IncomePage = () => {
@@ -23,8 +22,6 @@ const IncomePage = () => {
     cost_category: "",
   });
 
-
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [incomes, setIncomes] = useState([]);
   
 
@@ -43,18 +40,9 @@ const IncomePage = () => {
   }, []);
 
 
-
-   // ✅ Generate and open PDF in new tab
-  const handleVoucher = async (income) => {
-    try {
-      await generateReceiptPDF(income);
-      toast.success('PDF voucher generated successfully!');
-    } catch (error) {
-      console.error('PDF generation failed:', error);
-      toast.error('Failed to generate PDF voucher');
-    }
+  const handleVoucher = (id) => {
+    router.push(`/transaction/ReceiveList/${id}`);
   };
-
 
   
   // ✅ Apply filters
@@ -156,7 +144,6 @@ const IncomePage = () => {
             <tr className="bg-gray-600 text-white font-semibold">
               <th className="border px-2 py-1">SL</th>
               <th className="border px-2 py-1">Date</th>
-              <th className="border px-2 py-1">Receipt No</th>
               <th className="border px-2 py-1">Voucher No</th>
               <th className="border px-2 py-1">Account Title</th>
               <th className="border px-2 py-1">Source Category</th>
@@ -181,7 +168,6 @@ const IncomePage = () => {
                   <td className="border px-2 py-1">
                     {new Date(income.date).toLocaleDateString("en-GB")}
                   </td>
-                  <td className="border px-2 py-1">{income.receiptNo || "-"}</td>
                   <td className="border px-2 py-1">{income.voucherNo}</td>
                   <td className="border px-2 py-1">{income.accountTitle}</td>
                   <td className="border px-2 py-1">{income.sourceCategory}</td>
@@ -193,7 +179,7 @@ const IncomePage = () => {
                   <td className="border px-2 py-1">{income.remarks || "-"}</td>
                   <td className="border px-2 py-1">
                     <button 
-                        onClick={() => handleVoucher(income)} 
+                        onClick={() => handleVoucher(income.id)} 
                         className="bg-blue-500 px-1 py-1 rounded text-white hover:bg-blue-600 cursor-pointer">
                         Voucher
                     </button>
