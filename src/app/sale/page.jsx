@@ -5,6 +5,7 @@ import Select from "react-select";
 import axiosInstance from "../components/AxiosInstance";
 import { toast } from "react-hot-toast";
 import { useRef } from "react";
+import StockList from "../stock/list/page";
 
 export default function CustomerProductSale() {
   // Custom styles for react-select with vertical centering
@@ -200,8 +201,9 @@ export default function CustomerProductSale() {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    const fetchStocks = async () => {
+
+
+  const fetchStocks = async () => {
       try {
         const res = await axiosInstance.get("/stocks/");
         setStockList(res.data);
@@ -211,6 +213,7 @@ export default function CustomerProductSale() {
       }
     };
 
+  useEffect(() => {
     fetchStocks();
   }, []);
 
@@ -270,6 +273,8 @@ export default function CustomerProductSale() {
     }
   };
 
+  
+
   const [saleMRP, setSaleMRP] = useState("");
   const [price, setPrice] = useState("");
   const [percentage, setPercentage] = useState("");
@@ -278,6 +283,8 @@ export default function CustomerProductSale() {
   const [currentStock, setCurrentStock] = useState(0);
   const [selectedProductName, setSelectedProductName] = useState(null);
   const [selectedPartNumber, setSelectedPartNumber] = useState(null);
+
+
 
   // Filter products by selected company
   const filteredProducts = selectedCompany
@@ -289,7 +296,6 @@ export default function CustomerProductSale() {
     label: p.product_name,
     value: p.id,
     part_no: p.part_no,
-    current_stock_quantity: p.current_stock_quantity || 0,
   }));
 
   const partNumberOptions = filteredProducts.map((p) => ({
@@ -297,7 +303,6 @@ export default function CustomerProductSale() {
     value: p.part_no,
     product_id: p.id,
     product_name: p.product_name,
-    current_stock_quantity: p.current_stock_quantity || 0,
   }));
 
   // When company changes, reset product selection and fields
@@ -312,7 +317,6 @@ export default function CustomerProductSale() {
     setTotalPrice("0.00");
   }, [selectedCompany]);
 
-  // Debug version with console logs
 
   // Common function to set product data
   const setProductData = (product) => {
@@ -326,19 +330,12 @@ export default function CustomerProductSale() {
     setCurrentStock(stockQty);
 
     // Set MRP from product_mrp
-    const mrpValue = parseFloat(product.product_mrp || 0).toFixed(2);
-    setSaleMRP(mrpValue);
+    const mrpValue = parseFloat(stockItem.sale_price || 0);
+    setSaleMRP(mrpValue.toFixed(2));
+    setPrice(mrpValue.toFixed(2));
 
     setSaleQuantity("");
-
-    // Reset percentage to empty
     setPercentage("");
-
-    // Calculate initial price from product_bdt (without percentage)
-    const basePrice = parseFloat(product.product_bdt || 0);
-    setPrice(basePrice.toFixed(2));
-
-    // Reset total price
     setTotalPrice("0.00");
   };
 
@@ -357,14 +354,14 @@ export default function CustomerProductSale() {
 
       const prod = filteredProducts.find((p) => p.id === val.value);
       if (prod) {
-        // Set corresponding part number
         setSelectedPartNumber({ label: prod.part_no, value: prod.part_no });
-
-        // Set all product data
         setProductData(prod);
       }
     }
   };
+
+
+
 
   const handlePartNumberChange = (val) => {
     if (!val) {
@@ -384,8 +381,6 @@ export default function CustomerProductSale() {
       if (prod) {
         // Set corresponding product name
         setSelectedProductName({ label: prod.product_name, value: prod.id });
-
-        // Set all product data
         setProductData(prod);
       }
     }
@@ -403,15 +398,13 @@ export default function CustomerProductSale() {
       return;
     }
 
-    const prod = filteredProducts.find(
-      (p) => p.id === selectedProductName.value
+    const stockItem = stockList.find(
+      (s) => s.id === selectedProductName.value
     );
-    if (!prod) {
-      console.log("Product not found in filteredProducts");
-      return;
-    }
 
-    const basePrice = parseFloat(prod.product_bdt || 0);
+    console.log("Product is Selected", stockItem);
+
+    const basePrice = parseFloat(stockItem.sale_price || 0);
     const perc = parseFloat(percentage) || 0;
     const qty = parseInt(saleQuantity) || 0;
 
@@ -428,7 +421,7 @@ export default function CustomerProductSale() {
     console.log("Price with percentage:", priceWithPerc);
     setPrice(priceWithPerc.toFixed(2));
 
-    if (qty > 0) {
+    if (qty > 0){
       const tPrice = priceWithPerc * qty;
       console.log("Total price:", tPrice);
       setTotalPrice(tPrice.toFixed(2));
@@ -437,6 +430,8 @@ export default function CustomerProductSale() {
       setTotalPrice("0.00");
     }
   }, [percentage, saleQuantity, selectedProductName, filteredProducts]);
+
+
 
   // Add product to table
   const addProduct = () => {
@@ -555,6 +550,9 @@ export default function CustomerProductSale() {
   }, []);
 
   const handlePaymentChange = (name, value) => {
+    console.log("paymenMode", name);
+    console.log("value", value);
+    
     setPaymentData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -577,7 +575,7 @@ export default function CustomerProductSale() {
   };
 
   const selectedPaymentModeLabel = paymentModes.find(
-    (pm) => pm.value === paymentData.paymentMode
+    (pm) => pm.label === paymentData.paymentMode
   )?.label;
 
   const isCheque = selectedPaymentModeLabel === "Cheque";
@@ -651,6 +649,7 @@ export default function CustomerProductSale() {
 
       // Reset form
       resetForm();
+      fetchStocks();
     } catch (error) {
       console.error("Submission error:", error.response?.data);
 
@@ -1230,14 +1229,12 @@ export default function CustomerProductSale() {
             <Select
               options={paymentModes}
               value={
-                paymentModes.find(
-                  (opt) => opt.value === paymentData.paymentMode
-                ) || null
-              }
+                    paymentModes.find((pm) => pm.label === paymentData.paymentMode) || null
+                  }
               onChange={(selected) =>
                 handlePaymentChange(
                   "paymentMode",
-                  selected ? selected.value : ""
+                  selected ? selected.label : ""
                 )
               }
               placeholder="Select"
