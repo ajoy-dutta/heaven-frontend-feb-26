@@ -153,7 +153,7 @@ export default function CustomerProductSale() {
   const [companyList, setCompanyList] = useState([]);
   const [productList, setProductList] = useState([]);
 
-  const [selectedCompany, setSelectedCompany] = useState(null);
+  // const [selectedCompany, setSelectedCompany] = useState(null);
   const [stockList, setStockList] = useState([]);
 
   const [saleDate, setSaleDate] = useState(
@@ -178,14 +178,14 @@ export default function CustomerProductSale() {
       }
     };
 
-    const fetchCompanies = async () => {
-      try {
-        const res = await axiosInstance.get("/companies/");
-        setCompanyList(res.data);
-      } catch (err) {
-        toast.error("Failed to load companies");
-      }
-    };
+    // const fetchCompanies = async () => {
+    //   try {
+    //     const res = await axiosInstance.get("/companies/");
+    //     setCompanyList(res.data);
+    //   } catch (err) {
+    //     toast.error("Failed to load companies");
+    //   }
+    // };
 
     const fetchProducts = async () => {
       try {
@@ -197,7 +197,6 @@ export default function CustomerProductSale() {
     };
 
     fetchCustomers();
-    fetchCompanies();
     fetchProducts();
   }, []);
 
@@ -283,40 +282,21 @@ export default function CustomerProductSale() {
   const [currentStock, setCurrentStock] = useState(0);
   const [selectedProductName, setSelectedProductName] = useState(null);
   const [selectedPartNumber, setSelectedPartNumber] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-
-
-  // Filter products by selected company
-  const filteredProducts = selectedCompany
-    ? productList.filter((p) => p.company === selectedCompany.value)
-    : [];
 
   // Product name and part no options for selects
-  const productNameOptions = filteredProducts.map((p) => ({
+  const productNameOptions = productList.map((p) => ({
     label: p.product_name,
     value: p.id,
     part_no: p.part_no,
   }));
 
-  const partNumberOptions = filteredProducts.map((p) => ({
+  const partNumberOptions = productList.map((p) => ({
     label: p.part_no,
-    value: p.part_no,
-    product_id: p.id,
+    value: p.id,
     product_name: p.product_name,
   }));
-
-  // When company changes, reset product selection and fields
-  useEffect(() => {
-    setSelectedProductName(null);
-    setSelectedPartNumber(null);
-    setCurrentStock(0);
-    setSaleQuantity("");
-    setSaleMRP("");
-    setPrice("");
-    setPercentage("");
-    setTotalPrice("0.00");
-  }, [selectedCompany]);
-
 
   // Common function to set product data
   const setProductData = (product) => {
@@ -330,7 +310,7 @@ export default function CustomerProductSale() {
     setCurrentStock(stockQty);
 
     // Set MRP from product_mrp
-    const mrpValue = parseFloat(stockItem.sale_price || 0);
+    const mrpValue = parseFloat(stockItem.purchase_price || 0);
     setSaleMRP(mrpValue.toFixed(2));
     setPrice(mrpValue.toFixed(2));
 
@@ -352,9 +332,10 @@ export default function CustomerProductSale() {
     } else {
       setSelectedProductName(val);
 
-      const prod = filteredProducts.find((p) => p.id === val.value);
+      const prod = productList.find((p) => p.id === val.value);
       if (prod) {
         setSelectedPartNumber({ label: prod.part_no, value: prod.part_no });
+        setSelectedProduct({ label: prod.id, value: prod.part_no });
         setProductData(prod);
       }
     }
@@ -376,61 +357,47 @@ export default function CustomerProductSale() {
     } else {
       setSelectedPartNumber(val);
 
-      const prod = filteredProducts.find((p) => p.part_no === val.value);
+      const prod = productList.find((p) => p.id === val.value);
       console.log("Found product by part number:", prod);
       if (prod) {
-        // Set corresponding product name
         setSelectedProductName({ label: prod.product_name, value: prod.id });
+        setSelectedProduct({ label: prod.id, value: prod.part_no });
         setProductData(prod);
       }
     }
   };
 
   useEffect(() => {
-    console.log(
-      "useEffect triggered - percentage:",
-      percentage,
-      "saleQuantity:",
-      saleQuantity
-    );
-    if (!selectedProductName) {
+    if (!selectedProduct) {
       console.log("No product selected");
       return;
     }
 
     const stockItem = stockList.find(
-      (s) => s.id === selectedProductName.value
+      (s) => s.product?.id === parseInt(selectedProduct.label) && s.part_no === selectedProduct.value
     );
 
-    console.log("Product is Selected", stockItem);
+    if(stockItem && stockItem.current_stock_quantity < saleQuantity) {  
+      toast.error(`Sale quantity cannot exceed current stock (${stockItem.current_stock_quantity})`);
+      setSaleQuantity(stockItem.current_stock_quantity);
+      return;            
+    }
 
-    const basePrice = parseFloat(stockItem.sale_price || 0);
+    const basePrice = parseFloat(stockItem.purchase_price || 0);
     const perc = parseFloat(percentage) || 0;
     const qty = parseInt(saleQuantity) || 0;
 
-    console.log(
-      "Base price:",
-      basePrice,
-      "Percentage:",
-      perc,
-      "Quantity:",
-      qty
-    );
-
     const priceWithPerc = basePrice + (basePrice * perc) / 100;
-    console.log("Price with percentage:", priceWithPerc);
     setPrice(priceWithPerc.toFixed(2));
 
     if (qty > 0){
       const tPrice = priceWithPerc * qty;
-      console.log("Total price:", tPrice);
       setTotalPrice(tPrice.toFixed(2));
     } else {
       console.log("No quantity provided, setting total to 0");
       setTotalPrice("0.00");
     }
-  }, [percentage, saleQuantity, selectedProductName, filteredProducts]);
-
+  }, [percentage, saleQuantity]);
 
 
   // Add product to table
@@ -458,12 +425,6 @@ export default function CustomerProductSale() {
       return;
     }
 
-    if (parseInt(saleQuantity) > parseInt(currentStock)) {
-      toast.error(
-        `Sale quantity cannot exceed current stock (${currentStock})`
-      );
-      return;
-    }
 
     const newProd = {
       id: selectedProductName.value,
@@ -612,7 +573,6 @@ export default function CustomerProductSale() {
     try {
       const payload = {
         customer_id: selectedCustomer.value,
-        company_name: selectedCompany ? selectedCompany.label : "",
         sale_date: saleDate,
         total_amount: parseFloat(totalAmount),
         discount_amount: parseFloat(discountAmount) || 0,
@@ -691,7 +651,6 @@ export default function CustomerProductSale() {
       remarks: "",
       previous_due_amount: "",
     });
-    setSelectedCompany(null);
     setSelectedProductName(null);
     setSelectedPartNumber(null);
     setSaleDate(new Date().toISOString().split("T")[0]);
@@ -946,26 +905,6 @@ export default function CustomerProductSale() {
               />
             </div>
 
-            {/* Company */}
-            <div>
-              <label className="block mb-1 font-medium text-sm">
-                Company Name *
-              </label>
-              <Select
-                options={companyList.map((c) => ({
-                  label: c.company_name,
-                  value: c.id,
-                }))}
-                value={selectedCompany}
-                onChange={setSelectedCompany}
-                isClearable
-                placeholder="Select company"
-                className="text-sm"
-                styles={customSelectStyles}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-
             {/* Product Name */}
             <div>
               <label className="block mb-1 font-medium text-sm">
@@ -977,7 +916,6 @@ export default function CustomerProductSale() {
                 onChange={handleProductNameChange}
                 isClearable
                 placeholder="Select product name"
-                isDisabled={!selectedCompany}
                 className="text-sm"
                 styles={customSelectStyles}
                 onKeyDown={handleKeyDown}
@@ -995,7 +933,6 @@ export default function CustomerProductSale() {
                 onChange={handlePartNumberChange}
                 isClearable
                 placeholder="Select part number"
-                isDisabled={!selectedCompany}
                 className="text-sm"
                 styles={customSelectStyles}
                 onKeyDown={handleKeyDown}
@@ -1064,7 +1001,7 @@ export default function CustomerProductSale() {
               <input
                 type="number"
                 value={price}
-                readOnly
+                onChange={(e) => setPrice(e.target.value)}
                 className="w-full border rounded px-2 py-1 text-sm bg-gray-100"
                 onKeyDown={handleKeyDown}
               />

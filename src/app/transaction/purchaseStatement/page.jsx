@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { toast } from "react-hot-toast";
+import { handleDownloadPDF } from "./purchaseReport";
 
 
 export default function PurchaseStatementReport() {
@@ -115,14 +116,12 @@ export default function PurchaseStatementReport() {
       </div>
 
 
-
-    
       {/* Report Info */}
       {purchase.length > 0 && (
         <div>
             <div className="flex justify-end mb-3">
                 <button
-                onClick={() => handleDownloadPDF(purchase, filters, totalpurchase, totalPaid, totalDue, toast)}
+                onClick={() => handleDownloadPDF(purchase, filters, totalpurchase, toast)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
                 >
                 Download PDF
@@ -148,14 +147,7 @@ export default function PurchaseStatementReport() {
               {filters.to_date || "—"}
             </p>
             <p>
-              <strong>Name of Customer:</strong>{" "}
-              {purchase[0]?.customer?.customer_name || "—"}
-            </p>
-            <p>
-              <strong>Shop Name:</strong> {purchase[0]?.customer?.shop_name || "—"}
-            </p>
-            <p>
-              <strong>Address:</strong> {purchase[0]?.customer?.address || "—"}
+              <strong>Company Name:</strong> {filters.company || "—"}
             </p>
           </div>
 

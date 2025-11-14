@@ -267,133 +267,88 @@ export default function OrderFormPage() {
         </div>
       </Box>
 
-      {/* Search */}
-      <h2 className="mt-6 mb-2 font-semibold">Product Search</h2>
+      {/* 🔍 Company Selection */}
+      <h2 className="mt-6 mb-2 font-semibold">Select Company</h2>
       <Box>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          <div className="md:col-span-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div>
             <Label>Company Name:</Label>
-            <div className="flex gap-2">
-              <Select value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
-                <option value="">--Select--</option>
-                {companies.map((c) => (
-                  <option key={c.id} value={c.id}>{c.company_name}</option>
-                ))}
-              </Select>
-              <Button className="bg-emerald-400 text-white hover:bg-emerald-500">Search</Button>
-            </div>
-          </div>
-
-          <div className="md:col-span-4">
-            <Label>Product Name</Label>
-            <Select disabled={!companyId} value={productId} onChange={(e) => setProductId(e.target.value)}>
-              <option value="">Select product</option>
-              {productOptions.map((o) => (
-                <option key={o.id} value={o.id}>{o.name}</option>
+            <Select value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
+              <option value="">--Select--</option>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>{c.company_name}</option>
               ))}
             </Select>
-          </div>
-
-          <div className="md:col-span-4">
-            <Label>Part No</Label>
-            <Select disabled={!companyId} value={partNo} onChange={(e) => setPartNo(e.target.value)}>
-              <option value="">Select part</option>
-              {partOptions.map((o) => (
-                <option key={o.value} value={o.value}>{o.value}</option>
-              ))}
-            </Select>
-          </div>
-
-          <div className="md:col-span-3">
-            <Label>Current Stock</Label>
-            <Input value={currentStock} readOnly />
-          </div>
-
-          <div className="md:col-span-3">
-            <Label>Sale Price</Label>
-            <Input type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
-          </div>
-
-          <div className="md:col-span-3">
-            <Label>Qty</Label>
-            <Input type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} />
-          </div>
-
-          <div className="md:col-span-3 flex gap-2">
-            <Button
-              className={(editingIndex !== null ? "bg-amber-500 hover:bg-amber-600 text-white " : "bg-violet-600 hover:bg-violet-700 text-white ") + "w-full"}
-              onClick={addOrSaveLine}
-              disabled={!productId || !qty}
-            >
-              {editingIndex !== null ? "Save Line" : "Add"}
-            </Button>
-            {editingIndex !== null && (
-              <Button className="w-full hover:bg-gray-100" onClick={cancelLineEdit}>Cancel</Button>
-            )}
           </div>
         </div>
       </Box>
 
-      {/* Product Table */}
-      <h2 className="mt-6 mb-2 font-semibold">Product Details</h2>
-      <div className="border rounded-md overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-2 border">#</th>
-              <th className="p-2 border">Company</th>
-              <th className="p-2 border">Part No</th>
-              <th className="p-2 border">Product</th>
-              <th className="p-2 border">Price</th>
-              <th className="p-2 border">Qty</th>
-              <th className="p-2 border">Subtotal</th>
-              <th className="p-2 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr><td colSpan={8} className="p-3 text-center text-gray-500">No items added</td></tr>
-            ) : (
-              rows.map((r, i) => {
-                const sub = r.price * r.qty;
-                return (
-                  <tr key={`${r.product_id}-${i}`}>
-                    <td className="border p-2 text-center">{i + 1}</td>
-                    <td className="border p-2">{r.company_name}</td>
-                    <td className="border p-2">{r.part_no}</td>
-                    <td className="border p-2">{r.product_name}</td>
-                    <td className="border p-2 text-right">{r.price.toFixed(2)}</td>
-                    <td className="border p-2 text-right">{r.qty}</td>
-                    <td className="border p-2 text-right">{currency(sub)}</td>
-                    <td className="border p-2 text-center space-x-2">
-                      <Button
-                        onClick={() => editLine(i)}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 cursor-pointer"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => removeLine(i)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 cursor-pointer"
-                      >
-                        Remove
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={6} className="border p-2 text-right font-semibold">Total</td>
-              <td className="border p-2 text-right font-bold">{currency(total)}</td>
-              <td className="border p-2" />
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+      {/* 📦 Product Table for Selected Company */}
+      {companyId && (
+        <>
+          <h2 className="mt-6 mb-2 font-semibold">Products of this Company</h2>
+          <div className="border rounded-md overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="p-2 border">#</th>
+                  <th className="p-2 border text-left">Product Name</th>
+                  <th className="p-2 border text-left">Part No</th>
+                  <th className="p-2 border text-left">Category</th>
+                  <th className="p-2 border text-right">Current Stock</th>
+                   <th className="p-2 border text-right">MRP</th>
+                  <th className="p-2 border text-right">Qty</th>
+                  <th className="p-2 border text-right">Gross</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsForCompany.map((p, i) => {
+                  const st = stocks.find((s) => String(s.product?.id || s.product) === String(p.id));
+                  const currentStock = st?.current_stock_quantity || 0;
 
+                  const row = rows.find((r) => r.product_id === p.id);
+                  const qty = row?.qty || "";
+                  const price = row?.price || "";
+                  const gross = qty && price ? (qty * price).toFixed(2) : "";
+
+                  return (
+                    <tr key={p.id}>
+                      <td className="border p-2 text-center">{i + 1}</td>
+                      <td className="border p-2">{p.product_name}</td>
+                      <td className="border p-2">{p.part_no}</td>
+                      <td className="border p-2">{p.category_name || p.category || ""}</td>
+                      <td className="border p-2 text-right">{currentStock}</td>
+                      <td className="border p-2 text-right">{price.product_mrp}</td>
+                      <td className="border p-2 text-right">
+                        <input
+                          type="number"
+                          className="border rounded px-2 py-1 w-20 text-right"
+                          value={qty}
+                          min={0}
+                          onChange={(e) => {
+                            const newQty = e.target.value;
+                            setRows((prev) => {
+                              const copy = [...prev];
+                              const idx = copy.findIndex((r) => r.product_id === p.id);
+                              if (idx >= 0) copy[idx].qty = Number(newQty);
+                              else copy.push({ product_id: p.id, qty: Number(newQty), price: 0 });
+                              return copy;
+                            });
+                          }}
+                        />
+                      </td>
+                      
+                      <td className="border p-2 text-right font-medium">
+                        {gross ? currency(gross) : "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
       {/* Footer */}
       <div className="mt-6 flex justify-end">
         <Button className="bg-emerald-400 hover:bg-emerald-500 text-white" onClick={submit} disabled={saving || !rows.length}>

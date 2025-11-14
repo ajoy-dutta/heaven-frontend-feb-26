@@ -265,7 +265,7 @@ const handleDamageSave = async () => {
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Sale Qty</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Damage Qty</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Current Stock Qty</th>
-              <th className="whitespace-normal leading-tight text-center px-3 py-2">Purchase Price</th>
+              <th className="whitespace-normal leading-tight text-center px-3 py-2">MRP</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Sale Price</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Current Stock Value</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Net Weight</th>
