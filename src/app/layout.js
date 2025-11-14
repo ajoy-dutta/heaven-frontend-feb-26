@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ClientLayout from "./components/ClientLayout";
 import { UserProvider } from "./provider/UserProvider";
-import { Toaster } from "react-hot-toast";
-import LayoutWithSidebar from "./components/Sidebar";
+import { Toaster } from "react-hot-toast";  // ✅ import toaster
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +27,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <UserProvider>
-          <LayoutWithSidebar>
-            {children} {/* ✅ your pages will now render inside sidebar layout */}
-          </LayoutWithSidebar>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </UserProvider>
-        <Toaster position="top-center" reverseOrder={false} /> 
+        <Toaster position="top-center" reverseOrder={false} />  {/* ✅ show toast in the middle top */}
       </body>
     </html>
   );
