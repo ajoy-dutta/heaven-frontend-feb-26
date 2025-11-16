@@ -117,7 +117,7 @@ export default function LoanPurchaseEntry() {
 
             <form
                 onSubmit={handleSubmit}
-                className="space-y-8 bg-white shadow-lg rounded-2xl p-8 border border-blue-100"
+                className="space-y-8 bg-white rounded-2xl p-8"
             >
                 {/* Purchase Entry Section */}
                 <section>
@@ -237,7 +237,6 @@ export default function LoanPurchaseEntry() {
                             name="total_price"
                             value={formData.total_price}
                             onChange={handleChange}
-                            readOnly
                             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 
                  bg-gray-100 dark:bg-gray-800 dark:text-gray-300 cursor-not-allowed"
                         />

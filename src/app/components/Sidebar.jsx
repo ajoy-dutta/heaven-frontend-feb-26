@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useUser } from "../provider/UserProvider";
 import {
   Users,
+  UserPlus,
   Boxes,
   PackagePlus,
   Store,
@@ -18,14 +19,26 @@ import {
   Building2,
   Truck,
   UserCircle,
+  Bike,
+  ClipboardList,
+  NotebookText,
+  Banknote,
+  Landmark,
+  Receipt,
+  ArrowLeftRight,
+  Settings,
+  Menu,
+  LogOut,
 } from "lucide-react";
+
+
 
 function SidebarContent() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
   const pathname = usePathname();
   const Router = useRouter();
-  const { signOut } = useUser();
+  const { signOut, user } = useUser();
 
   const toggleSidebar = () => setIsMinimized((prev) => !prev);
   const toggleSubmenu = (label) => {
@@ -38,7 +51,6 @@ function SidebarContent() {
   };
 
   const links = [
-    { label: "Shop Profile", icon: <Store size={18} />, href: "/shop-profile" },
     { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
 
     // 🔹 EMPLOYEE MANAGE with new pages wired
@@ -124,48 +136,53 @@ function SidebarContent() {
     },
     {
       label: "Sale",
-      icon: "⚙️",
+      icon: <Receipt size={18} />,
       children: [
         { label: "Sale", href: "/sale" },
         { label: "Sale List", href: "/sale/list" },
       ],
     },
+
     {
       label: "Borrower",
-      icon: "⚙️",
+      icon: <UserPlus size={18} />,
       children: [
         { label: "Add Borrower", href: "/borrower/addBorrower" },
         { label: "Borrower List", href: "/borrower/borrowerList" },
       ],
     },
+
     {
       label: "Owed",
-      icon: "⚙️",
+      icon: <ArrowLeftRight size={18} />,
       children: [
         { label: "Add Owed", href: "/owe/addOwe" },
         { label: "Owed List", href: "/owe/oweList" },
       ],
     },
+
     {
       label: "Loan",
-      icon: "⚙️",
+      icon: <Banknote size={18} />,
       children: [
         { label: "Add Loan", href: "/loan/addLoan" },
         { label: "Loan List", href: "/loan/list" },
         { label: "Loan Statement", href: "/loan/statement" },
       ],
     },
+
     {
       label: "Bank Account",
-      icon: "⚙️",
+      icon: <Landmark size={18} />,
       children: [
         { label: "Bank Account Master", href: "/bankAccount/account-master" },
         { label: "Bank Account List", href: "/bankAccount/accountList" },
       ],
     },
+
     {
       label: "Transaction",
-      icon: "⚙️",
+      icon: <NotebookText size={18} />,
       children: [
         { label: "Add PayReceipt", href: "/transaction/addPay" },
         { label: "Daily Expenses", href: "/transaction/paymentList" },
@@ -179,9 +196,10 @@ function SidebarContent() {
         { label: "Income/Expenses", href: "/transaction/income-expense" },
       ],
     },
+
     {
       label: "Settings",
-      icon: "⚙️",
+      icon: <Settings size={18} />,
       children: [
         { label: "Company Master", href: "/settings/company" },
         { label: "Product Category Master", href: "/settings/productcategory" },
@@ -209,22 +227,13 @@ function SidebarContent() {
   }, [pathname]);
 
   return (
-    <div className="flex h-screen">
-      <aside
-        className={`bg-sky-900 text-white transition-all duration-300 ${
-          isMinimized ? "w-14" : "w-72"
-        } shadow-lg`}
-      >
+    <div className="flex h-screen mt-12">
+      <aside className={`bg-sky-900 pb-6 text-white transition-all duration-300 ${isMinimized ? "w-14" : "w-60"} shadow-lg`}>
         <div className="flex flex-col h-full px-2 py-4">
-          <div className="relative flex justify-between items-center border-b border-gray-700 pb-2">
-            {!isMinimized && (
-              <Link href="/" className="flex items-center gap-3 p-2">
-                <Image src="/Feroz_logo.jpg" alt="Logo" width={32} height={32} />
-                <span className="text-sm font-semibold">Feroz Autos</span>
-              </Link>
-            )}
-            <button onClick={toggleSidebar} className="p-2 text-white">
-              {isMinimized ? <MdChevronRight /> : <MdChevronLeft />}
+          
+          <div className="relative flex items-center justify-end border-b border-gray-700 pb-2 px-2 ">
+            <button onClick={toggleSidebar} className="">
+              <Menu size={24} className="text-white hover:cursor-pointer" />
             </button>
           </div>
 
@@ -298,19 +307,6 @@ function SidebarContent() {
             })}
           </nav>
 
-          <div className="mt-auto p-2 border-t border-gray-700">
-            <button
-              onClick={handleLogout}
-              className={`flex items-center text-xs gap-3 p-2 w-full rounded-lg transition cursor-pointer duration-200 ${
-                pathname === "/authentication"
-                  ? "bg-white text-black"
-                  : "hover:bg-white hover:text-black"
-              } ${isMinimized ? "justify-center" : ""}`}
-            >
-              <FaSignOutAlt />
-              {!isMinimized && <span>Log Out</span>}
-            </button>
-          </div>
         </div>
       </aside>
     </div>

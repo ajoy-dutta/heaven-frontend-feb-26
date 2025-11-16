@@ -3,6 +3,7 @@
 import React from "react";
 import SidebarContent from "./Sidebar";
 import ProtectedRoute from "../provider/ProtectedRoute";
+import SideNavbar from "./SideNav";
 import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
@@ -44,9 +45,9 @@ export default function ClientLayout({ children }) {
           <ProtectedRoute>
             <div className="flex flex-1 h-full">
               <SidebarContent />
+              <SideNavbar />
               <div className="flex-1 flex flex-col overflow-y-auto">
-                <div className="flex-1 p-10">{children}</div>
-                <Footer />
+                <div className="flex-1 p-10 mt-8">{children}</div>
               </div>
             </div>
           </ProtectedRoute>

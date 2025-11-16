@@ -13,6 +13,7 @@ import {
   User,
   LogOut,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function SideNavbar({ toggleSidebar }) {
   const { user, signOut } = useUser();
@@ -22,21 +23,14 @@ export default function SideNavbar({ toggleSidebar }) {
       
       {/* Left: Sidebar Toggle + Logo */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-md hover:bg-gray-100"
-        >
-          <Menu size={22} className="text-sky-900" />
-        </button>
-
-        <Link href="/dashboard" className="text-lg font-semibold text-sky-900">
-          Feroz Autos
+        <Link href="/" className="flex items-center gap-3 p-2">
+          <Image src="/Feroz_logo.jpg" alt="Logo" width={32} height={32} />
+          <span className="text-sm font-semibold">Feroz Autos</span>
         </Link>
       </div>
 
       {/* Middle: Quick Menu */}
       <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-
         <Link
           href="/stock/list"
           className="flex items-center gap-1 hover:text-sky-700"
@@ -55,7 +49,7 @@ export default function SideNavbar({ toggleSidebar }) {
           href="/supplier-purchase"
           className="flex items-center gap-1 hover:text-sky-700"
         >
-          <ShoppingCart size={18} /> Purchase
+          <ShoppingCart size={18} /> Supplier Purchase
         </Link>
 
         <Link
