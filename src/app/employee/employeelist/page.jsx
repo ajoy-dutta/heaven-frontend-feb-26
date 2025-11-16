@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { FaTrash, FaEdit, FaFilePdf } from "react-icons/fa";
 
@@ -12,6 +13,8 @@ export default function EmployeeList() {
     toDate: "",
     name: "",
   });
+
+  const router = useRouter();
 
   useEffect(() => {
     fetchEmployees();
@@ -40,41 +43,55 @@ export default function EmployeeList() {
   const applyFilters = ({ name, fromDate, toDate }) => {
     let filtered = [...employees];
 
+    // Name filter
     if (name) {
       filtered = filtered.filter((emp) =>
-        emp.employee_name.toLowerCase().includes(name.toLowerCase())
+        emp.employee_name?.toLowerCase().includes(name.toLowerCase())
       );
     }
 
+    // Date filters: compare only by date (YYYY-MM-DD)
     if (fromDate) {
-      filtered = filtered.filter((emp) =>
-        emp.created_at >= fromDate
-      );
+      filtered = filtered.filter((emp) => {
+        if (!emp.created_at) return false;
+        const empDate = new Date(emp.created_at).toISOString().slice(0, 10);
+        return empDate >= fromDate;
+      });
     }
 
     if (toDate) {
-      filtered = filtered.filter((emp) =>
-        emp.created_at <= toDate
-      );
+      filtered = filtered.filter((emp) => {
+        if (!emp.created_at) return false;
+        const empDate = new Date(emp.created_at).toISOString().slice(0, 10);
+        return empDate <= toDate;
+      });
     }
 
     setFilteredList(filtered);
   };
 
- const handleDelete = async (id) => {
-  if (!confirm("Are you sure you want to delete this employee?")) return;
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this employee?")) return;
 
-  try {
-    await AxiosInstance.delete(`/employees/${id}/`);
-    alert("Employee deleted successfully.");
-    fetchEmployees();  // re-fetch from server
-  } catch (error) {
-    console.error("Failed to delete employee", error);
-    alert("Error deleting employee.");
-  }
-};
+    try {
+      await AxiosInstance.delete(`/employees/${id}/`);
+      alert("Employee deleted successfully.");
+      fetchEmployees(); // re-fetch from server
+    } catch (error) {
+      console.error("Failed to delete employee", error);
+      alert("Error deleting employee.");
+    }
+  };
 
+  const handleSalaryStatementClick = (empId) => {
+    // Go to salary page with employee pre-selected
+    router.push(`/employee/salary?employee_id=${empId}`);
+  };
 
+  const handlePrintClick = (empId) => {
+    // You can change this to whatever print route you implement later
+    alert(`Print not implemented yet for employee ID: ${empId}`);
+  };
 
   return (
     <div className="text-sm text-slate-700 p-4">
@@ -117,12 +134,14 @@ export default function EmployeeList() {
             <th className="border border-slate-300 py-1 px-2">SL</th>
             <th className="border border-slate-300 py-1 px-2">Name</th>
             <th className="border border-slate-300 py-1 px-2">Employee Code</th>
-            <th className="border border-slate-300 py-1 px-2">Father's Name</th>
-            <th className="border border-slate-300 py-1 px-2">Mother's Name</th>
+            <th className="border border-slate-300 py-1 px-2">Father&apos;s Name</th>
+            <th className="border border-slate-300 py-1 px-2">Mother&apos;s Name</th>
             <th className="border border-slate-300 py-1 px-2">Mobile No</th>
             <th className="border border-slate-300 py-1 px-2">Print</th>
             <th className="border border-slate-300 py-1 px-2">Salary Statement</th>
-            <th colSpan={2} className="border border-slate-300 py-1 px-2">Action</th>
+            <th colSpan={2} className="border border-slate-300 py-1 px-2">
+              Action
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -136,22 +155,43 @@ export default function EmployeeList() {
             filteredList.map((emp, index) => (
               <tr key={emp.id} className="text-center">
                 <td className="border border-slate-300 py-1 px-2">{index + 1}</td>
-                <td className="border border-slate-300 py-1 px-2">{emp.employee_name}</td>
-                <td className="border border-slate-300 py-1 px-2">{emp.employee_code}</td>
-                <td className="border border-slate-300 py-1 px-2">{emp.father_name}</td>
-                <td className="border border-slate-300 py-1 px-2">{emp.mother_name}</td>
-                <td className="border border-slate-300 py-1 px-2">{emp.mobile_no}</td>
                 <td className="border border-slate-300 py-1 px-2">
-                  <FaFilePdf className="text-red-600 mx-auto cursor-pointer" />
+                  {emp.employee_name}
                 </td>
                 <td className="border border-slate-300 py-1 px-2">
-                  <FaFilePdf className="text-red-600 mx-auto cursor-pointer" />
+                  {emp.employee_code}
+                </td>
+                <td className="border border-slate-300 py-1 px-2">
+                  {emp.father_name}
+                </td>
+                <td className="border border-slate-300 py-1 px-2">
+                  {emp.mother_name}
+                </td>
+                <td className="border border-slate-300 py-1 px-2">
+                  {emp.mobile_no}
+                </td>
+                <td className="border border-slate-300 py-1 px-2">
+                  <FaFilePdf
+                    className="text-red-600 mx-auto cursor-pointer"
+                    title="Print Employee Info"
+                    onClick={() => handlePrintClick(emp.id)}
+                  />
+                </td>
+                <td className="border border-slate-300 py-1 px-2">
+                  <FaFilePdf
+                    className="text-red-600 mx-auto cursor-pointer"
+                    title="View Salary Statement"
+                    onClick={() => handleSalaryStatementClick(emp.id)}
+                  />
                 </td>
                 <td className="border border-slate-300 py-1 px-2">
                   <FaEdit className="text-yellow-600 mx-auto cursor-pointer" />
                 </td>
                 <td className="border border-slate-300 py-1 px-2">
-                  <FaTrash onClick={() => handleDelete(emp.id)} className="text-red-600 mx-auto cursor-pointer" />
+                  <FaTrash
+                    onClick={() => handleDelete(emp.id)}
+                    className="text-red-600 mx-auto cursor-pointer"
+                  />
                 </td>
               </tr>
             ))

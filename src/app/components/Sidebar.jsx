@@ -6,11 +6,19 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
 import Image from "next/image";
 import { useUser } from "../provider/UserProvider";
-import { Users, UserPlus,Boxes, PackagePlus,Store, LayoutDashboard,  Package ,
-   ShoppingCart, ListOrdered, Building2, Truck, UserCircle } from "lucide-react";
-import {  } from "lucide-react";
-
-
+import {
+  Users,
+  Boxes,
+  PackagePlus,
+  Store,
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  ListOrdered,
+  Building2,
+  Truck,
+  UserCircle,
+} from "lucide-react";
 
 function SidebarContent() {
   const [isMinimized, setIsMinimized] = useState(false);
@@ -30,23 +38,29 @@ function SidebarContent() {
   };
 
   const links = [
-    { label: "Shop Profile", icon: <Store size={18}/>, href: "/shop-profile" },
+    { label: "Shop Profile", icon: <Store size={18} />, href: "/shop-profile" },
     { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
+
+    // 🔹 EMPLOYEE MANAGE with new pages wired
     {
       label: "Employee Manage",
       icon: <Users size={18} />,
       children: [
         { label: "Add-Edit Employee", href: "/employee/addemployee" },
-        { label: "Employee List", href: "/employee/employeelist" }
-      ]
+        { label: "Employee List", href: "/employee/employeelist" },
+        { label: "Mark Attendance", href: "/employee/attendance" },
+        { label: "Attendance Report", href: "/employee/attendance-report" },
+        { label: "Salary Management", href: "/employee/salary" },
+      ],
     },
+
     {
       label: "Product",
       icon: <Package size={18} />,
       children: [
         { label: "Add Product", href: "/products/addproducts" },
-        { label: "Product List", href: "/products/productslist" }
-      ]
+        { label: "Product List", href: "/products/productslist" },
+      ],
     },
     {
       label: "Bike Models",
@@ -61,80 +75,76 @@ function SidebarContent() {
       icon: <Building2 size={18} />,
       children: [
         { label: "Add Exporter", href: "/exporter/addEdit" },
-        { label: "Exporter List", href: "/exporter/list" }
-      ]
+        { label: "Exporter List", href: "/exporter/list" },
+      ],
     },
     {
       label: "Supplier",
-      icon: <Truck size={18} />,       // Supplier = truck / delivery
+      icon: <Truck size={18} />,
       children: [
         { label: "Add Supplier", href: "/supplier/addEditSupplier" },
-        { label: "Supplier List", href: "/supplier/supplierList" }
-      ]
+        { label: "Supplier List", href: "/supplier/supplierList" },
+      ],
     },
     {
       label: "Customer",
-      icon: <UserCircle size={18} />,  
+      icon: <UserCircle size={18} />,
       children: [
         { label: "Add Customer", href: "/customer/addEditCustomer" },
-        { label: "Customer List", href: "/customer/customerList" }
-      ]
-    }, 
+        { label: "Customer List", href: "/customer/customerList" },
+      ],
+    },
     {
       label: "Stock",
-      icon: <Boxes size={18} />,   // Stock = boxes inventory
-      children: [{ label: "Stock List", href: "/stock/list" }]
+      icon: <Boxes size={18} />,
+      children: [{ label: "Stock List", href: "/stock/list" }],
     },
-
     {
       label: "Purchase Entry",
-      icon: <PackagePlus size={18} />, // Purchase entry = incoming package
-      href: "/purchaseEntry"
+      icon: <PackagePlus size={18} />,
+      href: "/purchaseEntry",
     },
-
     {
       label: "Product Purchase From Supplier",
-      icon: <ShoppingCart size={18} />, // Shopping cart = purchasing
-      href: "/supplier-purchase"
+      icon: <ShoppingCart size={18} />,
+      href: "/supplier-purchase",
     },
-
     {
       label: "Supplier Purchase List",
-      icon: <ListOrdered size={18} />, // List icon
-      href: "/purchase_list_from_supplier"
+      icon: <ListOrdered size={18} />,
+      href: "/purchase_list_from_supplier",
     },
     {
       label: "Product Order",
       icon: "⚙️",
       children: [
         { label: "Order Form", href: "/order/form" },
-        { label: "Order List", href: "/order/list" }
-      ]
+        { label: "Order List", href: "/order/list" },
+      ],
     },
-    
     {
       label: "Sale",
       icon: "⚙️",
       children: [
         { label: "Sale", href: "/sale" },
-        { label: "Sale List", href: "/sale/list" }
-      ]
+        { label: "Sale List", href: "/sale/list" },
+      ],
     },
     {
       label: "Borrower",
       icon: "⚙️",
       children: [
         { label: "Add Borrower", href: "/borrower/addBorrower" },
-        { label: "Borrower List", href: "/borrower/borrowerList" }
-      ]
+        { label: "Borrower List", href: "/borrower/borrowerList" },
+      ],
     },
     {
       label: "Owed",
       icon: "⚙️",
       children: [
         { label: "Add Owed", href: "/owe/addOwe" },
-        { label: "Owed List", href: "/owe/oweList" }
-      ]
+        { label: "Owed List", href: "/owe/oweList" },
+      ],
     },
     {
       label: "Loan",
@@ -142,16 +152,16 @@ function SidebarContent() {
       children: [
         { label: "Add Loan", href: "/loan/addLoan" },
         { label: "Loan List", href: "/loan/list" },
-        { label: "Loan Statement", href: "/loan/statement" }
-      ]
+        { label: "Loan Statement", href: "/loan/statement" },
+      ],
     },
     {
       label: "Bank Account",
       icon: "⚙️",
       children: [
         { label: "Bank Account Master", href: "/bankAccount/account-master" },
-        { label: "Bank Account List", href: "/bankAccount/accountList" }
-      ]
+        { label: "Bank Account List", href: "/bankAccount/accountList" },
+      ],
     },
     {
       label: "Transaction",
@@ -166,8 +176,8 @@ function SidebarContent() {
         { label: "Brand Wise Sale Statement Report", href: "/transaction/brandSaleStatement" },
         { label: "Purchase Statement Report", href: "/transaction/purchaseStatement" },
         { label: "Part No wise Purchase Statement Report", href: "/transaction/partwise" },
-        { label: "Income/Expenses", href: "/transaction/income-expense" }
-      ]
+        { label: "Income/Expenses", href: "/transaction/income-expense" },
+      ],
     },
     {
       label: "Settings",
@@ -182,14 +192,29 @@ function SidebarContent() {
         { label: "Country Master", href: "/settings/country" },
         { label: "Supplier Type Master", href: "/settings/suppliertype" },
         { label: "Bank Category Master", href: "/settings/bankcategory" },
-        { label: "Bank Master", href: "/settings/bank" }
-      ]
-    }
+        { label: "Bank Master", href: "/settings/bank" },
+      ],
+    },
   ];
+
+  // ✅ Fix: open the correct parent menu when a child route is active
+  useEffect(() => {
+    const newOpenMenus = {};
+    links.forEach((item) => {
+      if (item.children?.some((child) => pathname === child.href)) {
+        newOpenMenus[item.label] = true;
+      }
+    });
+    setOpenMenus((prev) => ({ ...prev, ...newOpenMenus }));
+  }, [pathname]);
 
   return (
     <div className="flex h-screen">
-      <aside className={`bg-sky-900 text-white transition-all duration-300 ${isMinimized ? "w-14" : "w-72"} shadow-lg`}>
+      <aside
+        className={`bg-sky-900 text-white transition-all duration-300 ${
+          isMinimized ? "w-14" : "w-72"
+        } shadow-lg`}
+      >
         <div className="flex flex-col h-full px-2 py-4">
           <div className="relative flex justify-between items-center border-b border-gray-700 pb-2">
             {!isMinimized && (
@@ -205,33 +230,34 @@ function SidebarContent() {
 
           <nav className="flex-1 mt-2 space-y-2 text-xs overflow-y-auto">
             {links.map((item, index) => {
-              const isChildActive = item.children?.some(child => pathname === child.href);
+              const isChildActive = item.children?.some(
+                (child) => pathname === child.href
+              );
               const isActive = item.href && pathname === item.href;
 
-              useEffect(() => {
-                if (isChildActive) {
-                  setOpenMenus((prev) => ({ ...prev, [item.label]: true }));
-                }
-              }, [pathname]);
-
               return (
-
-
                 <div key={index}>
                   {item.children ? (
                     <div>
                       <button
                         onClick={() => toggleSubmenu(item.label)}
-                        className={`flex items-center justify-between w-full p-2 text-left rounded-lg transition duration-200 ${openMenus[item.label] || isChildActive ? "bg-lime-100 text-black" : "hover:bg-white hover:text-black"
-                          }`}
+                        className={`flex items-center justify-between w-full p-2 text-left rounded-lg transition duration-200 ${
+                          openMenus[item.label] || isChildActive
+                            ? "bg-lime-100 text-black"
+                            : "hover:bg-white hover:text-black"
+                        }`}
                       >
                         <div className="flex items-center gap-3">
                           <span>{item.icon}</span>
                           {!isMinimized && <span>{item.label}</span>}
                         </div>
                         {!isMinimized && (
-                          <span className={`transition-transform duration-200 ${openMenus[item.label] ? "rotate-180" : ""}`}>
-                            &#9662; {/* Unicode for down arrow ▾ */}
+                          <span
+                            className={`transition-transform duration-200 ${
+                              openMenus[item.label] ? "rotate-180" : ""
+                            }`}
+                          >
+                            &#9662; {/* ▾ */}
                           </span>
                         )}
                       </button>
@@ -242,7 +268,11 @@ function SidebarContent() {
                             <Link
                               key={idx}
                               href={sub.href}
-                              className={`block p-2 mb-1 rounded-md text-sm transition ${pathname === sub.href ? "bg-lime-100 text-black" : "hover:bg-white hover:text-black"}`}
+                              className={`block p-2 mb-1 rounded-md text-sm transition ${
+                                pathname === sub.href
+                                  ? "bg-lime-100 text-black"
+                                  : "hover:bg-white hover:text-black"
+                              }`}
                             >
                               {sub.label}
                             </Link>
@@ -253,7 +283,11 @@ function SidebarContent() {
                   ) : (
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-3 p-2 rounded-lg transition-colors duration-200 ${isActive ? "bg-lime-100 text-black" : "hover:bg-white hover:text-black"} ${isMinimized ? "justify-center" : ""}`}
+                      className={`flex items-center gap-3 p-2 rounded-lg transition-colors duration-200 ${
+                        isActive
+                          ? "bg-lime-100 text-black"
+                          : "hover:bg-white hover:text-black"
+                      } ${isMinimized ? "justify-center" : ""}`}
                     >
                       <span>{item.icon}</span>
                       {!isMinimized && <span>{item.label}</span>}
@@ -267,7 +301,11 @@ function SidebarContent() {
           <div className="mt-auto p-2 border-t border-gray-700">
             <button
               onClick={handleLogout}
-              className={`flex items-center text-xs gap-3 p-2 w-full rounded-lg transition cursor-pointer duration-200 ${pathname === "/authentication" ? "bg-white text-black" : "hover:bg-white hover:text-black"} ${isMinimized ? "justify-center" : ""}`}
+              className={`flex items-center text-xs gap-3 p-2 w-full rounded-lg transition cursor-pointer duration-200 ${
+                pathname === "/authentication"
+                  ? "bg-white text-black"
+                  : "hover:bg-white hover:text-black"
+              } ${isMinimized ? "justify-center" : ""}`}
             >
               <FaSignOutAlt />
               {!isMinimized && <span>Log Out</span>}
