@@ -237,7 +237,7 @@ function SidebarContent() {
             </button>
           </div>
 
-          <nav className="flex-1 mt-2 space-y-2 text-xs overflow-y-auto">
+          <nav className="flex-1 mt-2 space-y-[2px] text-xs overflow-y-auto">
             {links.map((item, index) => {
               const isChildActive = item.children?.some(
                 (child) => pathname === child.href

@@ -29,7 +29,6 @@ export default function ProductEntryForm() {
     product_mrp: "",
     percentage: "",
     product_bdt: "",
-    product_code: "",
   });
 
   // ---------- data fetchers ----------
@@ -216,7 +215,6 @@ export default function ProductEntryForm() {
           remarks: "",
           product_mrp: "",
           percentage: "",
-          product_bdt: "",
         });
         setEditId(null);
         setBikeModelList([]); // ✅ reset suggestions
@@ -345,16 +343,6 @@ export default function ProductEntryForm() {
           </div>
 
           <div>
-            <label className="block ">Product Code</label>
-            <input
-              value={formData.product_code || "AUTO GENERATE"}
-              readOnly
-              className="w-full border rounded px-2 py-1 bg-gray-100 text-gray-500"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
             <label className="block ">Product Image:</label>
             <input
               type="file"
@@ -409,19 +397,6 @@ export default function ProductEntryForm() {
             />
           </div>
 
-          {/* Remarks */}
-          <div>
-            <label className="block ">Remarks:</label>
-            <textarea
-              name="remarks"
-              value={formData.remarks || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              rows="1"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
           <div>
             <label className="block ">MRP:</label>
             <input
@@ -459,7 +434,20 @@ export default function ProductEntryForm() {
             />
           </div>
 
+          {/* Remarks */}
           <div>
+            <label className="block ">Remarks:</label>
+            <textarea
+              name="remarks"
+              value={formData.remarks || ""}
+              onChange={handleChange}
+              className="w-full border rounded px-2 py-1"
+              rows="1"
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+
+          {/* <div>
             <label className="block ">
               HS Code:<span className="text-red-600">*</span>
             </label>
@@ -473,7 +461,8 @@ export default function ProductEntryForm() {
               className="w-full border rounded px-2 py-1"
               onKeyDown={handleKeyDown}
             />
-          </div>
+          </div> */}
+
         </div>
 
         {/* Buttons */}

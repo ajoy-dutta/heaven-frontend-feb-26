@@ -122,10 +122,7 @@ export default function OrderFormPage() {
     return products.filter((p) => p.company === id || p.company?.id === id);
   }, [companyId, products]);
 
-  const productOptions = useMemo(
-    () => productsForCompany.map((p) => ({ id: p.id, name: p.product_name, part: p.part_no })),
-    [productsForCompany]
-  );
+ 
   const partOptions = useMemo(
     () => productsForCompany.map((p) => ({ value: p.part_no, product_id: p.id })),
     [productsForCompany]
@@ -161,34 +158,7 @@ export default function OrderFormPage() {
     setQty("");
   };
 
-  const addOrSaveLine = () => {
-    const pid = Number(productId);
-    const prod = products.find((p) => p.id === pid);
-    if (!companyId) return alert("Choose company.");
-    if (!prod) return alert("Select product.");
-    const qn = Number(qty || 0);
-    if (qn <= 0) return alert("Enter quantity.");
-    const pr = Number(price || 0);
-
-    const newRow = {
-      product_id: pid,
-      company_name:
-        companies.find((c) => String(c.id) === String(companyId))?.company_name || "",
-      part_no: prod.part_no,
-      product_name: prod.product_name,
-      price: pr,
-      qty: qn,
-    };
-
-    setRows((prev) => {
-      const copy = [...prev];
-      if (editingIndex !== null) copy[editingIndex] = newRow;
-      else copy.push(newRow);
-      return copy;
-    });
-    setEditingIndex(null);
-    clearControls();
-  };
+ 
 
   const editLine = (i) => {
     const r = rows[i];
@@ -203,19 +173,6 @@ export default function OrderFormPage() {
     setPrice(String(r.price || ""));
     const st = stocks.find((s) => String(s.product?.id || s.product) === String(r.product_id));
     setCurrentStock(st?.current_stock_quantity || 0);
-  };
-
-  // 🔥 Added delete confirmation
-  const removeLine = (i) => {
-    const r = rows[i];
-    const confirmDelete = confirm(`Are you sure you want to remove ${r.product_name}?`);
-    if (!confirmDelete) return;
-    setRows((prev) => prev.filter((_, idx) => idx !== i));
-  };
-
-  const cancelLineEdit = () => {
-    setEditingIndex(null);
-    clearControls();
   };
 
   const total = useMemo(() => rows.reduce((s, r) => s + r.price * r.qty, 0), [rows]);
