@@ -217,28 +217,38 @@ export default function ProductDetailsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            {/* Image */}
-            <div className="bg-white border rounded-xl shadow p-4 flex items-center justify-center relative">
-              {stockLoaded && stockQty !== null && stockQty <= 0 && (
-                <span className="absolute top-2 right-2 text-[11px] px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">
-                  Out of stock
-                </span>
-              )}
-              {product.image ? (
-                <img
-                  src={toImg(product.image)}
-                  alt={product.product_name || "Product image"}
-                  className="max-h-96 w-auto object-contain"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="h-64 w-full bg-gray-100 rounded flex items-center justify-center text-gray-500">
-                  No image
+            {/* Image & Remarks Column */}
+            <div>
+              <div className="bg-white border rounded-xl shadow p-4 flex items-center justify-center relative mb-6">
+                {stockLoaded && stockQty !== null && stockQty <= 0 && (
+                  <span className="absolute top-2 right-2 text-[11px] px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">
+                    Out of stock
+                  </span>
+                )}
+                {product.image ? (
+                  <img
+                    src={toImg(product.image)}
+                    alt={product.product_name || "Product image"}
+                    className="max-h-96 w-auto object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="h-64 w-full bg-gray-100 rounded flex items-center justify-center text-gray-500">
+                    No image
+                  </div>
+                )}
+              </div>
+              
+              {/* Product Remarks */}
+              {product.remarks && (
+                <div className="text-sm text-gray-700 p-4 bg-white border rounded-xl shadow">
+                  <h3 className="font-semibold text-base mb-2">Product Details:</h3>
+                  <p className="whitespace-pre-wrap">{product.remarks}</p>
                 </div>
               )}
             </div>
 
-            {/* Product Details */}
+            {/* Product Details & Actions Column */}
             <div>
               <h1 className="text-2xl font-bold mb-2">{product.product_name}</h1>
               <div className="text-sm text-gray-600 mb-2">
@@ -249,15 +259,7 @@ export default function ProductDetailsPage() {
                   : ""}
               </div>
 
-              {priceText && <div className="text-2xl font-semibold mb-2">{priceText}</div>}
-
-              {/* Product Remarks */}
-              {product.remarks && (
-                <div className="text-sm text-gray-600 mb-4">
-                  <h3 className="font-semibold">Product Details:</h3>
-                  <p>{product.remarks}</p>
-                </div>
-              )}
+              {priceText && <div className="text-2xl font-semibold mb-4">{priceText}</div>}
 
               {/* Quantity Selector */}
               <label className="block text-sm text-gray-600 mb-1">Quantity</label>
@@ -322,6 +324,25 @@ export default function ProductDetailsPage() {
               >
                 {available ? "Add to Cart" : "Out of Stock"}
               </button>
+
+              {/* NEW Wholesale Box */}
+             <div className="mt-6 p-4 border border-red-400 bg-red-50 rounded-lg shadow-sm max-w-xs">
+  <h3 className="text-lg font-bold text-red-700 mb-2">
+    Wholesale Available
+  </h3>
+  <p className="text-gray-800 text-sm">
+    For more details Contact Us at
+  </p>
+  <p className="text-base font-semibold text-gray-900 my-1">
+    01712640394, 01785992164
+  </p>
+  <p className="text-gray-800 text-lg">
+    And visit our shop at
+  </p>
+  <p className="text-base font-semibold text-gray-900 my-1">
+   10, R.N. road, Mohshin Super Market, Jashore.
+  </p>
+</div>
             </div>
           </div>
 
@@ -362,202 +383,202 @@ export default function ProductDetailsPage() {
         </>
       )}
 
-{/* Floating WhatsApp Button */}
-<div
-  onClick={() => setChatOpen(!chatOpen)}
-  style={{
-    width: "70px",
-    height: "70px",
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
-    zIndex: 1000,
-    cursor: "pointer",
-  }}
->
-  <img
-    src="/wplogo.jpeg"
-    alt="WhatsApp"
-    style={{
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    }}
-    className="whatsapp-logo"
-  />
-</div>
-
-{/* WhatsApp Popup Chat Box */}
-{chatOpen && (
-  <div
-    style={{
-      position: "fixed",
-      bottom: "100px",
-      right: "20px",
-      width: "300px",
-      background: "#f0f0f0",
-      boxShadow: "0px 4px 20px rgba(0,0,0,0.2)",
-      borderRadius: "12px",
-      overflow: "hidden",
-      zIndex: 999,
-      animation: "chatFadeIn 0.25s ease",
-    }}
-  >
-    {/* Header */}
-    <div
-      style={{
-        background: "#25D366",
-        color: "white",
-        padding: "12px",
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-      }}
-    >
-      <img
-        src="/wplogo.jpeg"
-        style={{
-          width: "38px",
-          height: "38px",
-          borderRadius: "50%",
-          border: "2px solid white",
-          objectFit: "cover",
-        }}
-        alt="Support"
-      />
-      <div>
-        <div style={{ fontWeight: "bold", fontSize: "15px" }}>Feroz Autos</div>
-        <div style={{ fontSize: "12px", opacity: 0.9 }}>Online</div>
-      </div>
-
+      {/* Floating WhatsApp Button */}
       <div
+        onClick={() => setChatOpen(!chatOpen)}
         style={{
-          marginLeft: "auto",
+          width: "70px",
+          height: "70px",
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          zIndex: 1000,
           cursor: "pointer",
-          fontSize: "18px",
-          fontWeight: "bold",
-        }}
-        onClick={() => setChatOpen(false)}
-      >
-        ✕
-      </div>
-    </div>
-
-    {/* Chat Body */}
-    <div
-      style={{
-        padding: "12px",
-        height: "150px",
-        background: "#e5ddd5",
-        overflowY: "auto",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "80%",
-          background: "white",
-          padding: "10px 14px",
-          borderRadius: "14px",
-          marginBottom: "10px",
-          boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
         }}
       >
-        👋 Hello! How can we help you?
+        <img
+          src="/wplogo.jpeg"
+          alt="WhatsApp"
+          style={{
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+          }}
+          className="whatsapp-logo"
+        />
       </div>
 
-      {chatMessage.trim() !== "" && (
+      {/* WhatsApp Popup Chat Box */}
+      {chatOpen && (
         <div
           style={{
-            alignSelf: "flex-end",
-            maxWidth: "80%",
-            background: "#dcf8c6",
-            padding: "10px 14px",
-            borderRadius: "14px",
-            marginTop: "5px",
-            boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
+            position: "fixed",
+            bottom: "100px",
+            right: "20px",
+            width: "300px",
+            background: "#f0f0f0",
+            boxShadow: "0px 4px 20px rgba(0,0,0,0.2)",
+            borderRadius: "12px",
+            overflow: "hidden",
+            zIndex: 999,
+            animation: "chatFadeIn 0.25s ease",
           }}
         >
-          {chatMessage}
+          {/* Header */}
+          <div
+            style={{
+              background: "#25D366",
+              color: "white",
+              padding: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <img
+              src="/wplogo.jpeg"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                border: "2px solid white",
+                objectFit: "cover",
+              }}
+              alt="Support"
+            />
+            <div>
+              <div style={{ fontWeight: "bold", fontSize: "15px" }}>Feroz Autos</div>
+              <div style={{ fontSize: "12px", opacity: 0.9 }}>Online</div>
+            </div>
+
+            <div
+              style={{
+                marginLeft: "auto",
+                cursor: "pointer",
+                fontSize: "18px",
+                fontWeight: "bold",
+              }}
+              onClick={() => setChatOpen(false)}
+            >
+              ✕
+            </div>
+          </div>
+
+          {/* Chat Body */}
+          <div
+            style={{
+              padding: "12px",
+              height: "150px",
+              background: "#e5ddd5",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "80%",
+                background: "white",
+                padding: "10px 14px",
+                borderRadius: "14px",
+                marginBottom: "10px",
+                boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
+              }}
+            >
+              👋 Hello! How can we help you?
+            </div>
+
+            {chatMessage.trim() !== "" && (
+              <div
+                style={{
+                  alignSelf: "flex-end",
+                  maxWidth: "80%",
+                  background: "#dcf8c6",
+                  padding: "10px 14px",
+                  borderRadius: "14px",
+                  marginTop: "5px",
+                  boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
+                }}
+              >
+                {chatMessage}
+              </div>
+            )}
+          </div>
+
+          {/* Input Section */}
+          <div
+            style={{
+              background: "#f7f7f7",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              borderTop: "1px solid #ddd",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              style={{
+                flexGrow: 1,
+                padding: "10px",
+                borderRadius: "20px",
+                border: "1px solid #ddd",
+                outline: "none",
+                fontSize: "14px",
+                background: "white",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                if (!chatMessage.trim()) return;
+
+                const phone = "8801712640394";
+                const url = `https://wa.me/${phone}?text=${encodeURIComponent(
+                  chatMessage
+                )}`;
+                window.open(url, "_blank");
+              }}
+              className="send-btn"
+              style={{
+                background: "#25D366",
+                border: "none",
+                padding: "10px 12px",
+                borderRadius: "50%",
+                marginLeft: "8px",
+                cursor: "pointer",
+                color: "white",
+                fontSize: "16px",
+                transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
+              }}
+            >
+              ➤
+            </button>
+          </div>
         </div>
       )}
-    </div>
 
-    {/* Input Section */}
-    <div
-      style={{
-        background: "#f7f7f7",
-        padding: "10px",
-        display: "flex",
-        alignItems: "center",
-        borderTop: "1px solid #ddd",
-      }}
-    >
-      <input
-        type="text"
-        placeholder="Type a message..."
-        value={chatMessage}
-        onChange={(e) => setChatMessage(e.target.value)}
-        style={{
-          flexGrow: 1,
-          padding: "10px",
-          borderRadius: "20px",
-          border: "1px solid #ddd",
-          outline: "none",
-          fontSize: "14px",
-          background: "white",
-        }}
-      />
+      {/* Styles */}
+      <style jsx>{`
+        .whatsapp-logo:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 15px rgba(0, 128, 0, 0.7);
+        }
 
-<button
-  onClick={() => {
-    if (!chatMessage.trim()) return;
-
-    const phone = "8801712640394";
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(
-      chatMessage
-    )}`;
-    window.open(url, "_blank");
-  }}
-  className="send-btn"
-  style={{
-    background: "#25D366",
-    border: "none",
-    padding: "10px 12px",
-    borderRadius: "50%",
-    marginLeft: "8px",
-    cursor: "pointer",
-    color: "white",
-    fontSize: "16px",
-    transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
-  }}
->
-  ➤
-</button>
-    </div>
-  </div>
-)}
-
-{/* Styles */}
-<style jsx>{`
-  .whatsapp-logo:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 15px rgba(0, 128, 0, 0.7);
-  }
-
-  @keyframes chatFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-`}</style>
+        @keyframes chatFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
