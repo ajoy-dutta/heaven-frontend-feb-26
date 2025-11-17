@@ -41,14 +41,17 @@ function SidebarContent() {
   const { signOut, user } = useUser();
 
   const toggleSidebar = () => setIsMinimized((prev) => !prev);
+  
   const toggleSubmenu = (label) => {
-    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+    setOpenMenus((prev) => {
+      if (prev[label]) {
+        return {};
+      }
+      return { [label]: true };
+    });
   };
 
-  const handleLogout = () => {
-    signOut();
-    Router.push("/");
-  };
+
 
   const links = [
     { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
@@ -206,6 +209,7 @@ function SidebarContent() {
         { label: "Cost Category Master", href: "/settings/costcategory" },
         { label: "Source Category Master", href: "/settings/sourcecategory" },
         { label: "Payment Mode Master", href: "/settings/paymentmode" },
+        { label: "Division Master", href: "/settings/division" },
         { label: "District Master", href: "/settings/district" },
         { label: "Country Master", href: "/settings/country" },
         { label: "Supplier Type Master", href: "/settings/suppliertype" },

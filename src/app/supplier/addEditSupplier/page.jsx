@@ -4,9 +4,12 @@ import React, { useEffect, useState } from "react";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { useSearchParams } from "next/navigation";
 
+
 export default function SupplierForm() {
   const [supplierTypes, setSupplierTypes] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [divisions, setDivision] = useState([]);
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
 
   const searchParams = useSearchParams();
   const editingId = searchParams.get("id"); // will be null if not provided
@@ -14,6 +17,7 @@ export default function SupplierForm() {
 
   const [formData, setFormData] = useState({
     supplier_name: "",
+    division: "",
     district: "",
     country: "",
     supplier_type: "",
@@ -31,6 +35,7 @@ export default function SupplierForm() {
   useEffect(() => {
     fetchSupplierTypes();
     fetchDistricts();
+    fetchDivision();
   }, []);
 
   useEffect(() => {
@@ -57,18 +62,48 @@ export default function SupplierForm() {
     }
   };
 
+  const fetchDivision = async () => {
+    try {
+      const res = await AxiosInstance.get("/divisions/");
+      setDivision(res.data);
+    } catch (error) {
+      console.error("Error fetching division", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "division") {
+      const filteredDistricts = districts.filter((d) => d.division_name === value);
+      if (filteredDistricts.length > 0) {
+        setFilteredDistricts(filteredDistricts);
+      } else {
+        setFilteredDistricts([]);
+      }
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+
+  useEffect(() => {
+    if (formData.division && districts.length > 0) {
+      const filtered = districts.filter(
+        (d) => d.division_name === formData.division
+      );
+      setFilteredDistricts(filtered);
+    }
+  }, [formData.division, districts]);
+
 
   const fetchSupplier = async (id) => {
     try {
       const res = await AxiosInstance.get(`/suppliers/${id}/`);
       const data = res.data;
-
+      console.log("Fetched supplier data:", data);
+      
       setFormData({
         supplier_name: data.supplier_name ?? "",
+        division: data.division ?? "",
         district: data.district ?? "",
         country: data.country ?? "",
         supplier_type: data.supplier_type ?? "",
@@ -91,6 +126,7 @@ export default function SupplierForm() {
   const handleReset = () => {
     setFormData({
       supplier_name: "",
+      division: "",
       district: "",
       country: "",
       supplier_type: "",
@@ -111,7 +147,6 @@ export default function SupplierForm() {
     try {
       const payload = {
         ...formData,
-        district: parseInt(formData.district) || null,
         supplier_type: parseInt(formData.supplier_type) || null,
         previous_due_amount: formData.previous_due_amount
           ? parseFloat(formData.previous_due_amount)
@@ -176,224 +211,271 @@ export default function SupplierForm() {
   };
 
   return (
-    <div className="p-4 text-sm text-slate-700">
-      <h2 className="text-xl font-semibold mb-4">Supplier Entry</h2>
+    <div className="max-w-6xl mx-auto p-4">
+      <div className="bg-white shadow-lg rounded-xl p-4 border border-slate-200">
+        <h2 className="text-xl font-bold mb-4 text-slate-800 tracking-wide">
+          {editingId ? "Update Supplier" : "Add New Supplier"}
+        </h2>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-5 gap-4"
-      >
-        <div>
-          <label className="font-medium">
-            Supplier Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="supplier_name"
-            value={formData.supplier_name}
-            onChange={handleChange}
-            required
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"
+        >
+          {/* -------- SECTION TITLE -------- */}
+          <div className="md:col-span-3">
+            <h3 className="text-lg font-semibold text-blue-800">
+              Personal Information
+            </h3>
+            <div className="h-0.5 bg-blue-800/40 rounded"></div>
+          </div>
 
-        <div>
-          <label className="font-medium">
-            District <span className="text-red-500">*</span>
-          </label>
-        <select
-  name="district"
-  value={formData.district}
-  onChange={handleChange}
-  required
-  className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-  onKeyDown={handleKeyDown} // ✅ Add this line
->
-
-            <option value="">--Select--</option>
-            {districts.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="font-medium">
-            Country <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            required
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">
-            Supplier Type <span className="text-red-500">*</span>
-          </label>
-          <select
-            name="supplier_type"
-            value={formData.supplier_type}
-            onChange={handleChange}
-            required
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
+          {/* Supplier Name */}
+          <div className="col-span-1">
+            <label className="font-semibold text-slate-700">Supplier Name *</label>
+            <input
+              type="text"
+              name="supplier_name"
+              value={formData.supplier_name}
+              onChange={handleChange}
               onKeyDown={handleKeyDown}
-          >
-            <option value="">--Select--</option>
-            {supplierTypes.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-           
-          </select>
-        </div>
+              required
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <div>
-          <label className="font-medium">Shop Name</label>
-          <input
-            type="text"
-            name="shop_name"
-            value={formData.shop_name}
-            onChange={handleChange}
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">
-            Phone 1 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="phone1"
-            value={formData.phone1}
-            onChange={handleChange}
-            required
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">Phone 2</label>
-          <input
-            type="text"
-            name="phone2"
-            value={formData.phone2}
-            onChange={handleChange}
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">E-mail Id</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">
-            Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">Date of Birth</label>
-          <input
-            type="date"
-            name="date_of_birth"
-            value={formData.date_of_birth}
-            onChange={handleChange}
-            className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-             onKeyDown={handleKeyDown}
-          />
-        </div>
-
-        {/* 👇 Final ROW - 5 cells in grid 👇 */}
-        <div className="md:col-span-5 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          {/* Division */}
           <div>
-            <label className="font-medium">NID No</label>
+            <label className="font-semibold text-slate-700">Division *</label>
+            <select
+              name="division"
+              value={formData.division}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              required
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">-- Select --</option>
+              {divisions.map((d) => (
+                <option key={d.id} value={d.name}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* District */}
+          <div>
+            <label className="font-semibold text-slate-700">District *</label>
+            <select
+              name="district"
+              value={formData.district}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              required
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">-- Select --</option>
+              {filteredDistricts.map((d) => (
+                <option key={d.id} value={d.name}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Country */}
+          <div>
+            <label className="font-semibold text-slate-700">Country *</label>
+            <input
+              type="text"
+              name="country"
+              onKeyDown={handleKeyDown}
+              value={formData.country}
+              onChange={handleChange}
+              required
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Supplier Type */}
+          <div>
+            <label className="font-semibold text-slate-700">Supplier Type *</label>
+            <select
+              name="supplier_type"
+              value={formData.supplier_type}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              required
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">-- Select --</option>
+              {supplierTypes.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Shop Name */}
+          <div>
+            <label className="font-semibold text-slate-700">Shop Name</label>
+            <input
+              type="text"
+              name="shop_name"
+              value={formData.shop_name}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* -------- SECTION TITLE -------- */}
+          <div className="md:col-span-3">
+            <h3 className="text-lg font-semibold text-blue-800">
+              Contact Details
+            </h3>
+            <div className="h-0.5 bg-blue-800/40 rounded"></div>
+          </div>
+
+          {/* Phone 1 */}
+          <div>
+            <label className="font-semibold text-slate-700">Phone 1 *</label>
+            <input
+              type="text"
+              name="phone1"
+              value={formData.phone1}
+              onChange={handleChange}
+              required
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Phone 2 */}
+          <div>
+            <label className="font-semibold text-slate-700">Phone 2</label>
+            <input
+              type="text"
+              name="phone2"
+              value={formData.phone2}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="font-semibold text-slate-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Address */}
+          <div className="md:col-span-3">
+            <label className="font-semibold text-slate-700">Address *</label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+              onKeyDown={handleKeyDown}
+              rows="2"
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* -------- SECTION TITLE -------- */}
+          <div className="md:col-span-3">
+            <h3 className="text-lg font-semibold text-blue-800">
+              Additional Information
+            </h3>
+            <div className="h-0.5 bg-blue-800/40 rounded"></div>
+          </div>
+
+          {/* DOB */}
+          <div>
+            <label className="font-semibold text-slate-700">Date of Birth</label>
+            <input
+              type="date"
+              name="date_of_birth"
+              value={formData.date_of_birth}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* NID */}
+          <div>
+            <label className="font-semibold text-slate-700">NID No</label>
             <input
               type="text"
               name="nid_no"
               value={formData.nid_no}
               onChange={handleChange}
-              className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-               onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
+          {/* Remarks */}
           <div>
-            <label className="font-medium">Remarks</label>
+            <label className="font-semibold text-slate-700">Remarks</label>
             <input
               type="text"
               name="remarks"
               value={formData.remarks}
               onChange={handleChange}
-              className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-               onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
+          {/* Previous Due */}
           <div>
-            <label className="font-medium">Previous Due Amount</label>
+            <label className="font-semibold text-slate-700">
+              Previous Due Amount
+            </label>
             <input
               type="number"
               name="previous_due_amount"
               value={formData.previous_due_amount}
               onChange={handleChange}
-              className="border border-slate-400 py-1 px-2 rounded-xs w-full"
-               onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDown}
+              className="mt-1 border border-slate-300 py-1 px-3 rounded-md w-full focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* Buttons in last column */}
-          <div className="flex gap-2 cursor-pointer">
+          {/* -------- BUTTONS -------- */}
+          <div className="md:col-span-3 flex gap-4 mt-2">
             <button
               type="submit"
-              className="bg-blue-950 hover:bg-blue-700 text-white px-2 py-[6px] rounded-md w-1/3 cursor-pointer"
-               onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDown}
+              className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-1 rounded-lg font-medium shadow-md transition"
             >
-              {editingId ? "Update" : "Save"}
+              {editingId ? "Update Supplier" : "Save Supplier"}
             </button>
 
             <button
               type="button"
               onClick={handleReset}
-              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded cursor-pointer"
-               onKeyDown={handleKeyDown}
+              onKeyDown={handleKeyDown}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-1 rounded-lg font-medium shadow-md transition"
             >
               Reset
             </button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
+
   );
 }

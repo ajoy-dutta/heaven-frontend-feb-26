@@ -87,8 +87,12 @@ export default function OrderFormPage() {
     (async () => {
       try {
         const { data } = await AxiosInstance.get(`orders/${orderId}/`);
+
+        console.log("Loaded order data:", data);
+
         setOrderNo(data.order_no || "");
         if (data?.order_date) setOrderDate(data.order_date);
+        setCompanyId(data.company || "");
 
         const mapped =
           (data?.items || []).map((it) => {
@@ -181,6 +185,7 @@ export default function OrderFormPage() {
     if (!rows.length) return alert("Add at least one line.");
     const payload = {
       order_date: orderDate,
+      company : companyId,
       items: rows.map((r) => ({
         product_id: r.product_id,
         quantity: r.qty,

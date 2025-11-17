@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation";
 import Select from "react-select";
 import axiosInstance from "../../components/AxiosInstance";
 import toast from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
+
 
 export default function AddEditCustomerPage() {
   const router = useRouter();
-  const [initialData, setInitialData] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const searchParams = useSearchParams();
+  const editingId = searchParams.get("id");
 
   const [formData, setFormData] = useState({
     customerName: "",
+    division: "",
     district: null,
     customerType: "",
     shopName: "",
@@ -30,6 +33,8 @@ export default function AddEditCustomerPage() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [districts, setDistricts] = useState([]);
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  const [divisions, setDivisions] = useState([]);
   const customerTypes = ["Buyer", "Seller", "Wholeseller"];
 
   // Load edit data from localStorage
@@ -43,13 +48,22 @@ export default function AddEditCustomerPage() {
     }
   }, []);
 
+
+  useEffect(() => {
+      if (editingId) {
+        fetchCustomerData(editingId);
+      }
+    }, [editingId]);
+
   // Load districts from API
   useEffect(() => {
     const fetchDistricts = async () => {
       try {
         const res = await axiosInstance.get("/districts/");
-        const options = res.data.map(d => ({ value: d.id, label: d.name }));
-        setDistricts(options);
+        const res2 = await axiosInstance.get("/divisions/");
+      
+        setDistricts(res.data);
+        setDivisions(res2.data);
       } catch (error) {
         console.error("Failed to fetch districts", error);
         toast.error("Failed to load districts");
@@ -59,33 +73,58 @@ export default function AddEditCustomerPage() {
     fetchDistricts();
   }, []);
 
-  // Set form data when edit mode and districts are loaded
   useEffect(() => {
-    if (isEditMode && initialData && districts.length > 0) {
-      const selectedDistrict = districts.find(
-        d => d.label === initialData.district
+    if (formData.division && districts.length > 0) {
+      const filtered = districts.filter(
+        (d) => d.division_name === formData.division
       );
-
-      setFormData({
-        customerName: initialData.customer_name || "",
-        district: selectedDistrict || null,
-        customerType: initialData.customer_type || "",
-        shopName: initialData.shop_name || "",
-        phone1: initialData.phone1 || "",
-        phone2: initialData.phone2 || "",
-        email: initialData.email || "",
-        address: initialData.address || "",
-        dob: initialData.date_of_birth || "",
-        nid: initialData.nid_no || "",
-        courierName: initialData.courier_name || "",
-        remarks: initialData.remarks || "",
-        previousDue: initialData.previous_due_amount ? String(initialData.previous_due_amount) : "",
-      });
+      setFilteredDistricts(filtered);
     }
-  }, [initialData, isEditMode, districts]);
+  }, [formData.division, districts]);
+
+  // Set form data when edit mode and districts are loaded
+  const fetchCustomerData = async (id) => {
+    try {
+      const res = await axiosInstance.get(`/customers/${id}/`);
+      const data = res.data;
+      console.log("Fetched supplier data:", data);
+      
+      setFormData({
+        customerName: data.customer_name || "",
+        division: data.division || "",
+        district: data.district || "",
+        customerType: data.customer_type || "",
+        shopName: data.shop_name || "",
+        phone1: data.phone1 || "",
+        phone2: data.phone2 || "",
+        email: data.email || "",
+        address: data.address || "",
+        dob: data.date_of_birth || "",
+        nid: data.nid_no || "",
+        courierName: data.courier_name || "",
+        remarks: data.remarks || "",
+        previousDue: data.previous_due_amount ? String(data.previous_due_amount) : "",
+      });
+    } catch (error) {
+      console.error("Error fetching Customer", error);
+      alert("❌ Failed to load Customer data for editing.");
+    }
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "division") {
+      const filteredDistricts = districts.filter((d) => d.division_name === value);
+      console.log("districts",districts);
+      console.log("Selected Division:", value);
+      console.log("Filtered Districts:", filteredDistricts);
+      if (filteredDistricts.length > 0) {
+        setFilteredDistricts(filteredDistricts);
+      } else {
+        setFilteredDistricts([]);
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
@@ -121,7 +160,8 @@ export default function AddEditCustomerPage() {
     try {
       const payload = {
         customer_name: formData.customerName,
-        district: formData.district ? formData.district.label : null, // send name, not id
+        division: formData.division,
+        district: formData.district,
         customer_type: formData.customerType,
         shop_name: formData.shopName,
         phone1: formData.phone1,
@@ -135,8 +175,8 @@ export default function AddEditCustomerPage() {
         previous_due_amount: formData.previousDue ? parseFloat(formData.previousDue) : null,
       };
 
-      if (isEditMode && initialData) {
-        await axiosInstance.put(`/customers/${initialData.id}/`, payload);
+      if (editingId) {
+        await axiosInstance.put(`/customers/${editingId}/`, payload);
         toast.success("Customer updated successfully!");
       } else {
         await axiosInstance.post("/customers/", payload);
@@ -155,7 +195,7 @@ export default function AddEditCustomerPage() {
   const handleReset = () => {
     if (confirm("Are you sure you want to reset the form?")) {
       setFormData({
-        customerName: "", district: null, customerType: "", shopName: "", phone1: "",
+        customerName: "",division: null, district: null, customerType: "", shopName: "", phone1: "",
         phone2: "", email: "", address: "", dob: "", nid: "", courierName: "",
         remarks: "", previousDue: "",
       });
@@ -223,7 +263,7 @@ export default function AddEditCustomerPage() {
   return (
     <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md">
       <h2 className="text-3xl font-bold mb-8 text-center text-sky-800 tracking-wide">
-        {isEditMode ? "✏️ Edit Customer" : "🧾 Add New Customer"}
+        {editingId ? "✏️ Edit Customer" : "🧾 Add New Customer"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -238,27 +278,50 @@ export default function AddEditCustomerPage() {
             {renderField("customerName", "Customer Name", "text", true)}
             {renderField("dob", "Date of Birth", "date")}
 
-            {/* District */}
-            <div className="flex flex-col">
-              <label className="text-sm mb-1 font-semibold text-gray-700">
+
+          <div>
+              <label className="font-medium">
+                Division <span className="text-red-500">*</span>
+              </label>
+              <select
+                  name="division"
+                  value={formData.division}
+                  onChange={handleChange}
+                  required
+                  className="border border-slate-400 py-1 px-2 rounded-xs w-full"
+                  onKeyDown={handleKeyDown} // ✅ Add this line
+                >
+
+                <option value="">--Select--</option>
+                {divisions.map((d) => (
+                  <option key={d.id} value={d.name}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
+            <div>
+              <label className="font-medium">
                 District <span className="text-red-500">*</span>
               </label>
-              <Select
-                name="district"
-                value={formData.district}
-                onChange={(selected) => {
-                  setFormData((prev) => ({ ...prev, district: selected }));
-                  if (errors.district) setErrors((prev) => ({ ...prev, district: "" }));
-                }}
-                options={districts}
-                isClearable
-                placeholder="Select district"
-                classNamePrefix="react-select"
-                onKeyDown={handleKeyDown}
-              />
-              {errors.district && (
-                <span className="text-red-500 text-xs mt-1">{errors.district}</span>
-              )}
+              <select
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  required
+                  className="border py-1 px-2 rounded-xs w-full"
+                  onKeyDown={handleKeyDown} // ✅ Add this line
+                >
+
+                <option value="">--Select--</option>
+                {filteredDistricts.map((d) => (
+                  <option key={d.id} value={d.name}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Customer Type */}
@@ -326,7 +389,7 @@ export default function AddEditCustomerPage() {
           >
             {isSubmitting
               ? "Processing..."
-              : isEditMode
+              : editingId
                 ? "💾 Update Customer"
                 : "✅ Submit Customer"}
           </button>

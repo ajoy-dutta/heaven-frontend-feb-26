@@ -153,12 +153,11 @@ export default function SupplierListPage() {
               <tr className="font-light text-center">
                 <th className="p-2  border border-slate-400">SL</th>
                 <th className="p-2  border border-slate-400">Supplier Name</th>
-                <th className="p-2  border border-slate-400">District</th>
                 <th className="p-2  border border-slate-400">Country</th>
+                <th className="p-2  border border-slate-400">Division & District</th>
                 <th className="p-2  border border-slate-400">Supplier Type</th>
                 <th className="p-2  border border-slate-400">Shop Name</th>
-                <th className="p-2  border border-slate-400">Phone 1</th>
-                <th className="p-2  border border-slate-400">Phone 2</th>
+                <th className="p-2  border border-slate-400">Phone</th>
                 <th className="p-2  border border-slate-400">DOB</th>
                 <th className="p-2  border border-slate-400">Email</th>
                 <th className="p-2  border border-slate-400">Address</th>
@@ -180,10 +179,10 @@ export default function SupplierListPage() {
                       {s.supplier_name}
                     </td>
                     <td className="p-2  border border-slate-400">
-                      {s.district_detail?.name}
-                    </td>
-                    <td className="p-2  border border-slate-400">
                       {s.country}
+                    </td>
+                     <td className="p-2  border border-slate-400">
+                      {s.division}, {s.district}
                     </td>
                     <td className="p-2  border border-slate-400">
                       {s.supplier_type_detail?.name}
@@ -191,8 +190,10 @@ export default function SupplierListPage() {
                     <td className="p-2  border border-slate-400">
                       {s.shop_name || "-"}
                     </td>
-                    <td className="p-2  border border-slate-400">{s.phone1}</td>
-                    <td className="p-2  border border-slate-400">{s.phone2}</td>
+                    <td className="p-2  border border-slate-400">
+                      {s.phone1}<br></br>
+                      <span>{s.phone2}</span>
+                    </td>
                     <td className="p-2  border border-slate-400">{s.date_of_birth}</td>
                     <td className="p-2  border border-slate-400">{s.email}</td>
                     <td className="p-2  border border-slate-400">

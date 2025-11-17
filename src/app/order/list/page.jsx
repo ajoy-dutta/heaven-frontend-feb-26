@@ -39,26 +39,38 @@ function downloadBlob(filename, mime, content) {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+// making CSV content from order
 function orderToCSV(order) {
+  const ZW = "\u200C"; // invisible character to force text
+
   const rows = [];
-  rows.push(["Order No", order.order_no]);
-  rows.push(["Order Date", order.order_date]);
-  rows.push([]);
-  rows.push(["#", "Part No", "Product", "Qty", "Price", "Subtotal"]);
+
+  // ===== Order Header =====
+  rows.push(["", "Order No", order.order_no]);
+  rows.push(["", "Order Date", order.order_date]);
+  rows.push(["", "Company", order.company_name || ""]);
+  rows.push([""]);
+
+  // ===== Table Header =====
+  rows.push(["SL", "Part No", "Description", "Qty", "Unit"]);
 
   let i = 1;
-  (order.items || []).forEach((it) => {
-    const part = it?.product_details?.part_no ?? "";
-    const name = it?.product_details?.product_name ?? "";
-    const qty = Number(it.quantity || 0);
-    const price = Number(it.order_price || 0);
-    rows.push([i++, part, name, qty, price, qty * price]);
+
+  (order.items || []).forEach((item) => {
+    const sl = ZW + i++;  // text but invisible prefix
+    const part = ZW + (item?.product_details?.part_no ?? "");
+    const name = item?.product_details?.product_name ?? "";
+    const qty = ZW + (item.quantity || 0);
+
+    rows.push([sl, part, name, qty, "pcs"]);
   });
 
+  // ===== CSV Escape =====
   return rows
-    .map((r) =>
+    .map(r =>
       r
-        .map((c) => {
+        .map(c => {
           const s = String(c ?? "");
           return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
         })
@@ -66,6 +78,10 @@ function orderToCSV(order) {
     )
     .join("\n");
 }
+
+
+
+
 function orderToPrintableHTML(order) {
   const bodyRows = (order.items || [])
     .map((it, idx) => {

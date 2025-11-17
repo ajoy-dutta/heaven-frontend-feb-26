@@ -204,8 +204,16 @@ const handleDamageSave = async () => {
       }
     );
 
+    const updatedStock = response.data.data;
     toast.success("Damage quantity updated successfully!");
-    console.log("Damage quantity updated:", response.data);
+    console.log("Updated:", updatedStock);
+
+    setStockData((prev) =>
+      prev.map((item) =>
+        item.id === updatedStock.id ? { ...item, ...updatedStock } : item
+      )
+    );
+    
     document.getElementById("damage_modal").close();
   } catch (error) {
     console.error("Error updating damage quantity:", error);
@@ -254,11 +262,10 @@ const handleDamageSave = async () => {
         <table className="table text-sm">
           <thead>
             <tr className="bg-sky-800 text-white h-12 text-sm">
-              <th className="whitespace-normal leading-tight text-center px-3 py-2">I</th>
+              <th className="whitespace-normal leading-tight text-center px-3 py-2">SL</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Company</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Part No</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Product Name</th>
-              <th className="whitespace-normal leading-tight text-center px-3 py-2">Product Code</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Model No</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Brand</th>
               <th className="whitespace-normal leading-tight text-center px-3 py-2">Purchase Qty</th>
@@ -280,13 +287,12 @@ const handleDamageSave = async () => {
                 <td className="text-center">{stock.product?.category_detail?.company_detail?.company_name || "N/A"}</td>
                 <td className="text-center">{stock.part_no || "N/A"}</td>
                 <td className="text-center">{stock.product?.product_name || "N/A"}</td>
-                <td className="text-center">{stock.product?.product_code || "N/A"}</td>
                 <td className="text-center">{stock.product?.model_no || "N/A"}</td>
                 <td className="text-center">{stock.product?.brand_name || "N/A"}</td>
                 <td className="text-center">{stock.purchase_quantity}</td>
                 <td className="text-center">{stock.sale_quantity}</td>
                 <td className="text-center">{stock.damage_quantity}</td>
-                <td className="text-center">{stock.current_stock_quantity}</td>
+                <td className={`text-center font-semibold ${stock.current_stock_quantity <= 10 ? "text-red-500" : "text-black"}`}>{stock.current_stock_quantity}</td>
                 <td className="text-center">{parseFloat(stock.purchase_price || 0).toFixed(2)}</td>
                 <td className="text-center">{parseFloat(stock.sale_price || 0).toFixed(2)}</td>
                 <td className="text-center">{parseFloat(stock.current_stock_value || 0).toFixed(2)}</td>

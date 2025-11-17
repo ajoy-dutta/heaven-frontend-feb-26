@@ -151,7 +151,7 @@ export default function ProductEntryForm() {
       const mrp = parseFloat(updatedForm.product_mrp);
       const percentage = parseFloat(updatedForm.percentage);
       const isValid = !isNaN(mrp) && !isNaN(percentage);
-      const bdt = isValid ? (percentage * mrp).toFixed(2) : "";
+      const bdt = isValid ? (mrp + (percentage * mrp) / 100).toFixed(2) : "";
 
       setFormData({
         ...updatedForm,

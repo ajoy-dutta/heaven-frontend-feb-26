@@ -85,7 +85,8 @@ export default function AddEditExporter() {
             name="exporterName"
             value={formData.exporterName}
             onChange={handleChange}
-              className="border px-3 py-2 rounded text-sm"
+            className="border px-3 py-2 rounded text-sm"
+            required
             placeholder="Enter exporter name"
           />
         </div>
@@ -93,14 +94,14 @@ export default function AddEditExporter() {
         {/* Mail Address */}
         <div className="flex flex-col">
           <label className="block font-medium mb-1">
-            Mail Address: <span className="text-red-500">*</span>
+            Mail Address
           </label>
           <input
             type="email"
             name="mailAddress"
             value={formData.mailAddress}
             onChange={handleChange}
-             className="border px-3 py-2 rounded text-sm"
+            className="border px-3 py-2 rounded text-sm"
             placeholder="Enter mail address"
           />
         </div>
@@ -113,7 +114,7 @@ export default function AddEditExporter() {
             name="whatsappNumber"
             value={formData.whatsappNumber}
             onChange={handleChange}
-             className="border px-3 py-2 rounded text-sm"
+            className="border px-3 py-2 rounded text-sm"
             placeholder="Enter WhatsApp number"
           />
         </div>

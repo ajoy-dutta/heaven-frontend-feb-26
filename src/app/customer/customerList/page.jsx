@@ -5,6 +5,8 @@ import axiosInstance from "../../components/AxiosInstance";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { useRouter } from "next/navigation";
+import { AiFillEdit } from "react-icons/ai";
+import { RiDeleteBin6Fill } from "react-icons/ri";
 
 export default function CustomerListPage() {
   const [customers, setCustomers] = useState([]);
@@ -14,7 +16,6 @@ export default function CustomerListPage() {
   const [search, setSearch] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,10 +64,6 @@ export default function CustomerListPage() {
     }
   };
 
-  const handleEdit = (customer) => {
-    localStorage.setItem("editCustomerData", JSON.stringify(customer));
-    router.push("/customer/addEditCustomer");
-  };
 
   // Filtered data logic
   const filtered = customers.filter((c) => {
@@ -137,7 +134,6 @@ export default function CustomerListPage() {
           />
         </div>
       </div>
-
       {/* Loading Spinner */}
       {loading ? (
         <div className="flex justify-center py-20">
@@ -146,66 +142,100 @@ export default function CustomerListPage() {
       ) : (
         <>
           {/* Customer Table */}
-          <div className="overflow-x-auto bg-white shadow-lg rounded-2xl border border-gray-200">
-            <table className="min-w-full border-collapse text-center">
-              <thead className="bg-gradient-to-r from-sky-700 to-sky-500 text-white">
-                <tr>
-                  {[
-                    "#",
-                    "Customer Name",
-                    "Shop Name",
-                    "Phone",
-                    "District",
-                    "Type",
-                    "Previous Due",
-                    "Actions",
-                  ].map((head) => (
-                    <th key={head} className="p-3 border border-sky-600 text-sm">
-                      {head}
-                    </th>
-                  ))}
+          <div className="overflow-x-auto border border-gray-300 shadow-sm bg-white">
+            <table className="table table-xs border border-slate-400 min-w-full border-collapse text-sm">
+              <thead className="bg-sky-900 text-white">
+                <tr className="font-light text-center">
+                  <th className="p-2 border border-slate-400">SL</th>
+                  <th className="p-2 border border-slate-400">Customer Name</th>
+                  <th className="p-2 border border-slate-400">Type</th>
+                  <th className="p-2 border border-slate-400">Shop Name</th>
+                  <th className="p-2 border border-slate-400">Phone</th>
+                  <th className="p-2 border border-slate-400">Email</th>
+                  <th className="p-2 border border-slate-400">Division & District</th>
+                  <th className="p-2 border border-slate-400">Address</th>
+                  <th className="p-2 border border-slate-400">DOB</th>
+                  <th className="p-2 border border-slate-400">Previous Due</th>
+                  <th className="p-2 border border-slate-400">Created Date</th>
+                  <th className="p-2 border border-slate-400">NID</th>
+                  <th className="p-2 border border-slate-400">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((c, idx) => (
                     <tr
                       key={c.id}
-                      className="border-t hover:bg-sky-50 transition-all duration-150"
+                      className="odd:bg-white even:bg-sky-50 text-center text-sm"
                     >
-                      <td className="p-3 border">
+                      <td className="p-2 border border-slate-400">
                         {(currentPage - 1) * pageSize + idx + 1}
                       </td>
-                      <td className="p-3 border font-semibold text-gray-700">
+
+                      <td className="p-2 border border-slate-400">
                         {c.customer_name}
                       </td>
-                      <td className="p-3 border text-gray-600">
-                        {c.shop_name || "-"}
-                      </td>
-                      <td className="p-3 border text-gray-700">{c.phone1}</td>
-                      <td className="p-3 border text-gray-700">
-                        {c.district || "-"}
-                      </td>
-                      <td className="p-3 border text-gray-700">
+
+                      <td className="p-2 border border-slate-400">
                         {c.customer_type}
                       </td>
-                      <td className="p-3 border text-gray-700 font-medium">
+
+                      <td className="p-2 border border-slate-400">
+                        {c.shop_name || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.phone1}
+                        <br />
+                        <span>{c.phone2}</span>
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.email || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.division || "-"}, {c.district || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.address || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.dob || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400 text-right">
                         {c.previous_due_amount
                           ? Number(c.previous_due_amount).toFixed(2)
                           : "0.00"}
                       </td>
-                      <td className="p-3 border space-x-2">
+
+                      <td className="p-2 border border-slate-400">
+                        {c.created_at?.split("T")[0] ?? "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400">
+                        {c.NID || "-"}
+                      </td>
+
+                      <td className="p-2 border border-slate-400 flex items-center justify-center gap-2">
                         <button
-                          onClick={() => handleEdit(c)}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition-all"
+                          onClick={() =>
+                            router.push(`/customer/addEditCustomer?id=${c.id}`)
+                          }
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white p-1 rounded text-xs"
                         >
-                          Edit
+                          <AiFillEdit className="text-black" />
                         </button>
+
                         <button
                           onClick={() => handleDelete(c.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all"
+                          className="bg-red-600 hover:bg-red-700 text-white p-1 rounded text-xs"
                         >
-                          Delete
+                          <RiDeleteBin6Fill />
                         </button>
                       </td>
                     </tr>
@@ -213,8 +243,8 @@ export default function CustomerListPage() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={8}
-                      className="p-5 text-gray-500 italic bg-gray-50"
+                      className="p-2 border text-center text-gray-500 bg-gray-50"
+                      colSpan={13}
                     >
                       No customers found.
                     </td>
@@ -230,10 +260,11 @@ export default function CustomerListPage() {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${currentPage === 1
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                  currentPage === 1
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                     : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
-                  }`}
+                }`}
               >
                 ◀ Previous
               </button>
@@ -242,24 +273,24 @@ export default function CustomerListPage() {
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${currentPage === i + 1
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                    currentPage === i + 1
                       ? "bg-sky-600 text-white border-sky-600"
                       : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
-                    }`}
+                  }`}
                 >
                   {i + 1}
                 </button>
               ))}
 
               <button
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, totalPages))
-                }
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${currentPage === totalPages
+                className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                  currentPage === totalPages
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                     : "bg-white hover:bg-sky-100 text-sky-700 border-sky-300"
-                  }`}
+                }`}
               >
                 Next ▶
               </button>
