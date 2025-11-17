@@ -198,22 +198,22 @@ const handleDamageSave = async () => {
 
   try {
     const response = await axiosInstance.patch(
-      `/stocks/${selectedStock.id}/set-damage-quantity/`,
-      {
-        damage_quantity: damageQty,
-      }
-    );
+        `/stocks/${selectedStock.id}/set-damage-quantity/`,
+        {
+          damage_quantity: damageQty,
+        }
+      );
 
     const updatedStock = response.data.data;
-    toast.success("Damage quantity updated successfully!");
     console.log("Updated:", updatedStock);
 
-    setStockData((prev) =>
+    setStocks((prev) =>
       prev.map((item) =>
         item.id === updatedStock.id ? { ...item, ...updatedStock } : item
       )
     );
-    
+
+    toast.success("Damage quantity updated successfully!");
     document.getElementById("damage_modal").close();
   } catch (error) {
     console.error("Error updating damage quantity:", error);
