@@ -21,13 +21,17 @@ export default function ProductDetailsPage() {
   const [company, setCompany] = useState(null);
   const [bikeModel, setBikeModel] = useState(null);
   const [product, setProduct] = useState(null);
-  const [stock, setStock] = useState(undefined); // undefined = not fetched yet, null = fetched but none
+  const [stock, setStock] = useState(undefined);
   const [related, setRelated] = useState([]);
   const [quantity, setQuantity] = useState(1);
 
   const { cart, addToCart } = useCart();
 
-  // base url for images (/media/…)
+  // WhatsApp Chat State
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+
+  // Base URL for images
   const apiBase = useMemo(() => {
     const b = AxiosInstance.defaults.baseURL || "";
     return b.replace(/\/api\/?$/, "").replace(/\/+$/, "");
@@ -38,7 +42,7 @@ export default function ProductDetailsPage() {
     return `${apiBase}${src.startsWith("/") ? "" : "/"}${src}`;
   };
 
-  // ---- Stock helpers -------------------------------------------------
+  // Stock helpers
   const readStockQty = (s) => {
     if (!s) return null;
     const candidates = [
@@ -69,8 +73,7 @@ export default function ProductDetailsPage() {
     return Number.isNaN(num) ? `৳ ${val}` : `৳ ${num.toFixed(2)}`;
   };
 
-  // --------------------------------------------------------------------
-
+  // Fetch data on load
   useEffect(() => {
     if (!brandId || !modelId || !productId) return;
     let alive = true;
@@ -117,7 +120,7 @@ export default function ProductDetailsPage() {
 
         setProduct(prod);
 
-        // fetch stock for this product (+ optional part_no)
+        // Fetch stock
         try {
           const stockUrl = prod?.part_no
             ? `/stocks/?product=${prod.id}&part_no=${encodeURIComponent(prod.part_no)}`
@@ -129,7 +132,7 @@ export default function ProductDetailsPage() {
           if (alive) setStock(null);
         }
 
-        // related
+        // Related products
         let rel = [];
         try {
           const urlFK = `/products/?company=${brandId}&bike_model=${modelId}`;
@@ -163,32 +166,30 @@ export default function ProductDetailsPage() {
   }, [brandId, modelId, productId]);
 
   const priceText = readSalePrice(product, stock);
-  const stockQty = readStockQty(stock); // number | null
+  const stockQty = readStockQty(stock);
   const stockLoaded = stock !== undefined;
   const available = stockLoaded ? (stockQty === null ? true : stockQty > 0) : true;
 
-  // build the cart item
+  // Build the cart item
   const buildCartItem = () => ({
     id: product.id,
     product_name: product.product_name,
     image: toImg(product.image),
-    price:
-      parseFloat(
-        stock?.sale_price ??
-          product?.product_bdt ??
-          product?.product_mrp ??
-          product?.price ??
-          0
-      ) || 0,
+    price: parseFloat(
+      stock?.sale_price ??
+        product?.product_bdt ??
+        product?.product_mrp ??
+        product?.price ??
+        0
+    ) || 0,
     part_no: product.part_no || product.product_code || null,
     qty: quantity,
   });
 
-  // guard: keep quantity within 1..stockQty (if known)
   useEffect(() => {
     if (stockQty != null && quantity > stockQty) setQuantity(stockQty > 0 ? stockQty : 1);
     if (quantity < 1) setQuantity(1);
-  }, [stockQty]); // eslint-disable-line
+  }, [stockQty]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-6 pb-12">
@@ -237,10 +238,9 @@ export default function ProductDetailsPage() {
               )}
             </div>
 
-            {/* Details */}
+            {/* Product Details */}
             <div>
               <h1 className="text-2xl font-bold mb-2">{product.product_name}</h1>
-
               <div className="text-sm text-gray-600 mb-2">
                 {product.part_no
                   ? `SKU: ${product.part_no}`
@@ -251,7 +251,15 @@ export default function ProductDetailsPage() {
 
               {priceText && <div className="text-2xl font-semibold mb-2">{priceText}</div>}
 
-              {/* Quantity (editable + buttons) */}
+              {/* Product Remarks */}
+              {product.remarks && (
+                <div className="text-sm text-gray-600 mb-4">
+                  <h3 className="font-semibold">Product Details:</h3>
+                  <p>{product.remarks}</p>
+                </div>
+              )}
+
+              {/* Quantity Selector */}
               <label className="block text-sm text-gray-600 mb-1">Quantity</label>
               <div className="flex items-center gap-2 mb-6">
                 <button
@@ -266,14 +274,13 @@ export default function ProductDetailsPage() {
                   type="number"
                   inputMode="numeric"
                   min={1}
-                  // do not show max to the user to avoid leaking stock; we just clamp on change
                   className="w-20 border rounded px-3 py-1 text-center"
                   value={quantity}
                   onChange={(e) => {
                     const v = e.target.value.replace(/[^\d]/g, "");
                     let n = v === "" ? 1 : parseInt(v, 10);
                     if (Number.isNaN(n) || n < 1) n = 1;
-                    if (stockQty != null && n > stockQty) n = stockQty; // silently clamp
+                    if (stockQty != null && n > stockQty) n = stockQty;
                     setQuantity(n);
                   }}
                 />
@@ -284,7 +291,7 @@ export default function ProductDetailsPage() {
                   onClick={() =>
                     setQuantity((q) => {
                       const next = q + 1;
-                      if (stockQty != null && next > stockQty) return q; // block
+                      if (stockQty != null && next > stockQty) return q;
                       return next;
                     })
                   }
@@ -303,7 +310,6 @@ export default function ProductDetailsPage() {
                     : "bg-gray-200 text-gray-500 cursor-not-allowed"
                 }`}
                 onClick={() => {
-                  // hard guard against over-stock
                   const inCart = cart.find((c) => c.id === product.id)?.qty || 0;
                   const desired = inCart + quantity;
                   if (stockQty != null && desired > stockQty) {
@@ -319,7 +325,7 @@ export default function ProductDetailsPage() {
             </div>
           </div>
 
-          {/* Related */}
+          {/* Related Products */}
           <h2 className="text-xl font-semibold mb-4">Related Products</h2>
           {related.length === 0 ? (
             <div className="text-gray-600">No related products.</div>
@@ -355,6 +361,203 @@ export default function ProductDetailsPage() {
           )}
         </>
       )}
+
+{/* Floating WhatsApp Button */}
+<div
+  onClick={() => setChatOpen(!chatOpen)}
+  style={{
+    width: "70px",
+    height: "70px",
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    zIndex: 1000,
+    cursor: "pointer",
+  }}
+>
+  <img
+    src="/wplogo.jpeg"
+    alt="WhatsApp"
+    style={{
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    }}
+    className="whatsapp-logo"
+  />
+</div>
+
+{/* WhatsApp Popup Chat Box */}
+{chatOpen && (
+  <div
+    style={{
+      position: "fixed",
+      bottom: "100px",
+      right: "20px",
+      width: "300px",
+      background: "#f0f0f0",
+      boxShadow: "0px 4px 20px rgba(0,0,0,0.2)",
+      borderRadius: "12px",
+      overflow: "hidden",
+      zIndex: 999,
+      animation: "chatFadeIn 0.25s ease",
+    }}
+  >
+    {/* Header */}
+    <div
+      style={{
+        background: "#25D366",
+        color: "white",
+        padding: "12px",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+      }}
+    >
+      <img
+        src="/wplogo.jpeg"
+        style={{
+          width: "38px",
+          height: "38px",
+          borderRadius: "50%",
+          border: "2px solid white",
+          objectFit: "cover",
+        }}
+        alt="Support"
+      />
+      <div>
+        <div style={{ fontWeight: "bold", fontSize: "15px" }}>Feroz Autos</div>
+        <div style={{ fontSize: "12px", opacity: 0.9 }}>Online</div>
+      </div>
+
+      <div
+        style={{
+          marginLeft: "auto",
+          cursor: "pointer",
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
+        onClick={() => setChatOpen(false)}
+      >
+        ✕
+      </div>
+    </div>
+
+    {/* Chat Body */}
+    <div
+      style={{
+        padding: "12px",
+        height: "150px",
+        background: "#e5ddd5",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "80%",
+          background: "white",
+          padding: "10px 14px",
+          borderRadius: "14px",
+          marginBottom: "10px",
+          boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
+        }}
+      >
+        👋 Hello! How can we help you?
+      </div>
+
+      {chatMessage.trim() !== "" && (
+        <div
+          style={{
+            alignSelf: "flex-end",
+            maxWidth: "80%",
+            background: "#dcf8c6",
+            padding: "10px 14px",
+            borderRadius: "14px",
+            marginTop: "5px",
+            boxShadow: "0px 1px 3px rgba(0,0,0,0.15)",
+          }}
+        >
+          {chatMessage}
+        </div>
+      )}
+    </div>
+
+    {/* Input Section */}
+    <div
+      style={{
+        background: "#f7f7f7",
+        padding: "10px",
+        display: "flex",
+        alignItems: "center",
+        borderTop: "1px solid #ddd",
+      }}
+    >
+      <input
+        type="text"
+        placeholder="Type a message..."
+        value={chatMessage}
+        onChange={(e) => setChatMessage(e.target.value)}
+        style={{
+          flexGrow: 1,
+          padding: "10px",
+          borderRadius: "20px",
+          border: "1px solid #ddd",
+          outline: "none",
+          fontSize: "14px",
+          background: "white",
+        }}
+      />
+
+<button
+  onClick={() => {
+    if (!chatMessage.trim()) return;
+
+    const phone = "8801712640394";
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(
+      chatMessage
+    )}`;
+    window.open(url, "_blank");
+  }}
+  className="send-btn"
+  style={{
+    background: "#25D366",
+    border: "none",
+    padding: "10px 12px",
+    borderRadius: "50%",
+    marginLeft: "8px",
+    cursor: "pointer",
+    color: "white",
+    fontSize: "16px",
+    transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
+  }}
+>
+  ➤
+</button>
+    </div>
+  </div>
+)}
+
+{/* Styles */}
+<style jsx>{`
+  .whatsapp-logo:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(0, 128, 0, 0.7);
+  }
+
+  @keyframes chatFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`}</style>
     </div>
   );
 }

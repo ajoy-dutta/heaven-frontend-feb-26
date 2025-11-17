@@ -208,7 +208,7 @@ const getStatusForDay = (empId, day) => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border px-2 py-1 min-w-[150px] text-left">
-                  Employee
+                  Employee/ Date
                 </th>
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
                   (day) => (
