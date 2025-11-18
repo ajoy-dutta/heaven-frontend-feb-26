@@ -1,7 +1,7 @@
 "use client";
 
 import AxiosInstance from "@/app/components/AxiosInstance";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function CompanyPage() {
@@ -19,17 +19,40 @@ export default function CompanyPage() {
   const [editingId, setEditingId] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // ✅ Normalize image URL so it works on nested routes and in production
+  // ✅ Take the origin (host + optional port) from AxiosInstance
+  const apiOrigin = useMemo(() => {
+    const base = AxiosInstance.defaults.baseURL || "";
+
+    if (!base) return "";
+
+    try {
+      const url = new URL(base);
+      return url.origin; // e.g. https://ferozautos.com.bd:8000
+    } catch {
+      // if base is something like "https://ferozautos.com.bd/api/"
+      // and URL ctor fails for some reason, just strip the /api part
+      return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
+    }
+  }, []);
+
+  // ✅ Build a full URL that always hits the backend origin
   const getImageUrl = (src) => {
     if (!src) return null;
 
-    // already absolute (http / https or protocol-relative)
+    // If backend already returns an absolute URL, just use it
     if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
       return src;
     }
 
-    // make sure it starts from the site root
-    return src.startsWith("/") ? src : `/${src}`;
+    const path = src.startsWith("/") ? src : `/${src}`;
+
+    // If we know the backend origin, always hit that
+    if (apiOrigin) {
+      return `${apiOrigin}${path}`;
+    }
+
+    // Fallback – previous behaviour
+    return path;
   };
 
   // Fetch all companies
@@ -119,7 +142,7 @@ export default function CompanyPage() {
       image: null,
     });
 
-    // ✅ show current logo from backend in preview (normalized)
+    // show current logo from backend in preview (normalized)
     setPreview(getImageUrl(company.image) || null);
     setEditingId(company.id);
   };
