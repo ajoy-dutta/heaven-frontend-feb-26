@@ -3,28 +3,29 @@
 import React, { useState, useEffect } from "react";
 import AxiosInstance from "@/app/components/AxiosInstance";
 import { toast } from "react-hot-toast";
-import { handleDownloadPDF } from "./purchaseReport";
+import { handleDownloadPDF } from "./partwisePurchaseReport";
 
 
 export default function PurchaseStatementReport() {
-  const [companies, setCompanies] = useState([]);
+  const [products, setProducts] = useState([]);
   const [purchase, setPurchase] = useState([]);
   const [filters, setFilters] = useState({
-    company: "",
+    part_no: "",
     from_date: "",
     to_date: "",
   });
+  const [productName, setProductName] = useState("");
 
   useEffect(() => {
-    const fetchCompany = async () => {
+    const fetchProducts = async () => {
       try {
-        const res = await AxiosInstance.get("companies/");
-        setCompanies(res.data);
+        const res = await AxiosInstance.get("products/");
+        setProducts(res.data);
       } catch (err) {
         console.error(err);
       }
     };
-    fetchCompany();
+    fetchProducts();
   }, []);
 
   const handleChange = (e) => {
@@ -32,10 +33,14 @@ export default function PurchaseStatementReport() {
   };
 
   const handleSearch = async () => {
-    if (!filters.from_date) {
-      toast.error("Please select a From Date");
+    if (!filters.part_no) {
+      toast.error("Please select a Part No.");
       return;
     }
+
+    const product_name = products.find(p => p.part_no === filters.part_no)?.product_name || "";
+    setProductName(product_name);
+
     try {
       const res = await AxiosInstance.get("purchase-report/", { params: filters });
       setPurchase(res.data);
@@ -45,8 +50,7 @@ export default function PurchaseStatementReport() {
     }
   };
 
-  console.log("Purchases", purchase)
-
+  
   const totalpurchase = purchase.reduce(
     (acc, p) => acc + parseFloat(p.purchase_amount || 0),
     0
@@ -64,18 +68,18 @@ export default function PurchaseStatementReport() {
       <div className="grid grid-cols-4 gap-4 mb-8 items-end">
         <div>
           <label className="block text-sm font-medium mb-1">
-            Company:
+            Part No.:
           </label>
           <select
-            name="company"
-            value={filters.company}
+            name="part_no"
+            value={filters.part_no}
             onChange={handleChange}
             className="w-full border rounded-md px-2 py-1"
           >
             <option value="">--Select--</option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.company_name}>
-                {c.company_name}
+            {products.map((p) => (
+              <option key={p.part_no} value={p.part_no}>
+                {p.part_no}
               </option>
             ))}
           </select>
@@ -119,7 +123,7 @@ export default function PurchaseStatementReport() {
         <div>
             <div className="flex justify-end mb-3">
                 <button
-                onClick={() => handleDownloadPDF(purchase, filters, totalpurchase, toast)}
+                onClick={() => handleDownloadPDF(purchase, filters, productName, totalpurchase, toast)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
                 >
                 Download PDF
@@ -145,7 +149,7 @@ export default function PurchaseStatementReport() {
               {filters.to_date || "—"}
             </p>
             <p>
-              <strong>Company Name:</strong> {filters.company || "—"}
+              <strong>Product:</strong> {productName}
             </p>
           </div>
 
@@ -157,7 +161,6 @@ export default function PurchaseStatementReport() {
                 <th className="border px-3 py-2">Date</th>
                 <th className="border px-3 py-2">Invoice No</th>
                 <th className="border px-3 py-2">Part No</th>
-                <th className="border px-3 py-2">Product Name</th>
                 <th className="border px-3 py-2">Supplier/Exporter Name</th>
                 <th className="border px-3 py-2 text-right">Quantity</th>
                 <th className="border px-3 py-2 text-right">Purchase Amount</th>
@@ -169,7 +172,6 @@ export default function PurchaseStatementReport() {
                 <td className="border px-3 py-2">{p.date || "—"}</td>
                 <td className="border px-3 py-2">{p.invoice_no || "—"}</td>
                 <td className="border px-3 py-2">{p.part_no || "—"}</td>
-                <td className="border px-3 py-2">{p.product_name || "—"}</td>
                 <td className="border px-3 py-2">{p.supplier_or_exporter || "—"}</td>
                 <td className="border px-3 py-2 text-right">{p.quantity || 0}</td>
                 <td className="border px-3 py-2 text-right">
@@ -179,23 +181,23 @@ export default function PurchaseStatementReport() {
             ))}
             </tbody>
 
-    <tfoot className="bg-gray-100 font-semibold">
-      <tr>
-        <td className="border px-3 py-2 text-right" colSpan={6}>
-          Total Purchase:
-        </td>
-        <td className="border px-3 py-2 text-right">
-          {purchase
-            .reduce(
-              (acc, p) => acc + parseFloat(p.purchase_amount || 0),
-              0
-            )
-            .toFixed(2)}
-        </td>
-      </tr>
-    </tfoot>
-  </table>
-</div>
+            <tfoot className="bg-gray-100 font-semibold">
+            <tr>
+                <td className="border px-3 py-2 text-right" colSpan={5}>
+                Total Purchase:
+                </td>
+                <td className="border px-3 py-2 text-right">
+                {purchase
+                    .reduce(
+                    (acc, p) => acc + parseFloat(p.purchase_amount || 0),
+                    0
+                    )
+                    .toFixed(2)}
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        </div>
 
         </div>
       )}

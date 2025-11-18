@@ -195,7 +195,7 @@ function SidebarContent() {
         { label: "Sale Statement Report", href: "/transaction/customerStatement" },
         { label: "Brand Wise Sale Statement Report", href: "/transaction/brandSaleStatement" },
         { label: "Purchase Statement Report", href: "/transaction/purchaseStatement" },
-        { label: "Part No wise Purchase Statement Report", href: "/transaction/partwise" },
+        { label: "Part No wise Purchase Statement Report", href: "/transaction/partwisePurchase" },
         { label: "Income/Expenses", href: "/transaction/income-expense" },
       ],
     },

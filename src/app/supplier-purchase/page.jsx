@@ -515,7 +515,7 @@ export default function SupplierProductPurchase() {
     const payload = {
       invoice_no: "",
       supplier_id: selectedSupplier.value,
-      company_name: selectedCompany ? selectedCompany.value : null,
+      company_name: selectedCompany ? selectedCompany.label : null,
       purchase_date: purchaseDate,
       total_amount: totalAmount,
       discount_amount: parseFloat(discountAmount) || 0,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AxiosInstance from '../components/AxiosInstance';
 
 export default function LoanPurchaseEntry() {
@@ -16,6 +16,9 @@ export default function LoanPurchaseEntry() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [exporters, setExporters] = useState([]);
     const [companies, setCompanies] = useState([]);
+    const fileInputRef = useRef(null);
+    
+
 
     useEffect(() => {
         const fetchExporters = async () => {
@@ -53,13 +56,10 @@ export default function LoanPurchaseEntry() {
         setSelectedFile(e.target.files[0]);
     };
 
-    const handleUpload = () => {
-        if (selectedFile) {
-            console.log('Selected file:', selectedFile.name);
-        } else {
-            alert('Please select a file first.');
-        }
-    };
+    useEffect(() => {
+    console.log("Selected File:", selectedFile);
+    }, [selectedFile]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -103,6 +103,9 @@ export default function LoanPurchaseEntry() {
                 total_price: '',
             });
             setSelectedFile(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
             alert('Error saving purchase entry. Check console for details.');
@@ -219,6 +222,7 @@ export default function LoanPurchaseEntry() {
                             <input
                                 type="file"
                                 name="xl_file"
+                                ref={fileInputRef}
                                 onChange={handleFileChange}
                                 className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 
                                 bg-white dark:bg-gray-800 dark:text-gray-300 cursor-pointer focus:ring-2 

@@ -4,6 +4,7 @@ import autoTable from "jspdf-autotable";
 export const handleDownloadPDF = (
   purchaseData,
   filters,
+  productName,
   totalpurchase,
   toast
 ) => {
@@ -48,7 +49,7 @@ export const handleDownloadPDF = (
   // ===== TITLE =====
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("Company Wise Purchase Report", pageWidth / 2, 115, {
+  doc.text("Part No. Wise Purchase Report", pageWidth / 2, 115, {
     align: "center",
   });
 
@@ -56,7 +57,7 @@ export const handleDownloadPDF = (
   const yStart = 140;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
-  doc.text(`Company Name: ${filters.company || "—"}`, 40, yStart);
+  doc.text(`Product Name: ${productName || "—"}`, 40, yStart);
   doc.text(`Date Range: ${filters.from_date || "—"} to ${filters.to_date || "—"}`, 40, yStart + 18);
 
   // ===== TABLE HEAD =====
@@ -64,7 +65,6 @@ export const handleDownloadPDF = (
     "Date",
     "Invoice No",
     "Part No",
-    "Product Name",
     "Supplier/Exporter Name",
     "Qty",
     "Purchase Amount",
@@ -78,7 +78,6 @@ export const handleDownloadPDF = (
         purchase.date || "—",
         purchase.invoice_no || "—",
         purchase.part_no || "—",
-        purchase.product_name || "—",
         purchase.supplier_or_exporter || "—",
         purchase.quantity?.toFixed(2) || "0.00",
         purchase.purchase_amount
@@ -132,6 +131,6 @@ export const handleDownloadPDF = (
 
   // ===== SAVE PDF =====
   doc.save(
-    `${filters.company}_purchase report_${filters.fromDate || ""}_to_${filters.toDate || ""}.pdf`
+    `${productName}_purchase report_${filters.fromDate || ""}_to_${filters.toDate || ""}.pdf`
   );
 };
