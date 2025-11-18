@@ -1,7 +1,7 @@
 "use client";
 
 import AxiosInstance from "@/app/components/AxiosInstance";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function CompanyPage() {
@@ -19,35 +19,17 @@ export default function CompanyPage() {
   const [editingId, setEditingId] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // ✅ Same base URL logic as BrandsPage
-  const apiBase = useMemo(() => {
-    const base = AxiosInstance.defaults.baseURL || "";
-
-    if (!base) return "";
-
-    try {
-      const url = new URL(base);
-      return url.origin; // e.g. https://ferozautos.com.bd
-    } catch {
-      return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
-    }
-  }, []);
-
+  // ✅ Normalize image URL so it works on nested routes and in production
   const getImageUrl = (src) => {
     if (!src) return null;
 
-    // Already absolute
+    // already absolute (http / https or protocol-relative)
     if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
       return src;
     }
 
-    const path = src.startsWith("/") ? src : `/${src}`;
-
-    if (apiBase) {
-      return `${apiBase}${path}`;
-    }
-
-    return path;
+    // make sure it starts from the site root
+    return src.startsWith("/") ? src : `/${src}`;
   };
 
   // Fetch all companies
@@ -72,7 +54,7 @@ export default function CompanyPage() {
     setPreview(file ? URL.createObjectURL(file) : null);
   };
 
-  // Create or update company
+  // Create or update company (multipart)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -136,7 +118,8 @@ export default function CompanyPage() {
       country: company.country || "",
       image: null,
     });
-    // ✅ Use normalized URL for existing image
+
+    // ✅ show current logo from backend in preview (normalized)
     setPreview(getImageUrl(company.image) || null);
     setEditingId(company.id);
   };
@@ -249,7 +232,7 @@ export default function CompanyPage() {
               rows={1}
               onChange={handleChange}
               required
-              className="border rounded-sm px-2 py-[3px] w-full"
+              className="border rounded-sm px-2 py-[3px]  w-full"
               onKeyDown={handleKeyDown}
             />
           </div>
