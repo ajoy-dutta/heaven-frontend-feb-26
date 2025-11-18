@@ -8,15 +8,40 @@ export default function BrandsPage() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Base URL for media
+  // Base URL (scheme + host) for media resources
   const apiBase = useMemo(() => {
     const base = AxiosInstance.defaults.baseURL || "";
-    return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
+
+    if (!base) return "";
+
+    // Prefer using URL to safely extract origin, fall back to regex
+    try {
+      const url = new URL(base);
+      return url.origin; // e.g. https://ferozautos.com.bd
+    } catch {
+      // Fallback: strip trailing /api or slashes
+      return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
+    }
   }, []);
 
   const getImageUrl = (src) => {
     if (!src) return null;
-    return src.startsWith("http") ? src : `${apiBase}${src.startsWith("/") ? "" : "/"}${src}`;
+
+    // Already absolute (http/https) or protocol-relative
+    if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
+      return src;
+    }
+
+    // Ensure the path starts with a single leading slash
+    const path = src.startsWith("/") ? src : `/${src}`;
+
+    // If we have a base (backend origin), prefix it
+    if (apiBase) {
+      return `${apiBase}${path}`;
+    }
+
+    // Fallback – just return the path as-is
+    return path;
   };
 
   useEffect(() => {
@@ -54,6 +79,7 @@ export default function BrandsPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 place-items-center">
           {brands.map((b) => {
             const img = getImageUrl(b.image);
+
             return (
               <Link
                 key={b.id}
