@@ -1,7 +1,7 @@
 "use client";
 
 import AxiosInstance from "@/app/components/AxiosInstance";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function CompanyPage() {
@@ -12,12 +12,43 @@ export default function CompanyPage() {
     email: "",
     address: "",
     country: "",
-    image: null, // NEW
+    image: null,
   });
 
   const [companies, setCompanies] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [preview, setPreview] = useState(null); // NEW
+  const [preview, setPreview] = useState(null);
+
+  // ✅ Same base URL logic as BrandsPage
+  const apiBase = useMemo(() => {
+    const base = AxiosInstance.defaults.baseURL || "";
+
+    if (!base) return "";
+
+    try {
+      const url = new URL(base);
+      return url.origin; // e.g. https://ferozautos.com.bd
+    } catch {
+      return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
+    }
+  }, []);
+
+  const getImageUrl = (src) => {
+    if (!src) return null;
+
+    // Already absolute
+    if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
+      return src;
+    }
+
+    const path = src.startsWith("/") ? src : `/${src}`;
+
+    if (apiBase) {
+      return `${apiBase}${path}`;
+    }
+
+    return path;
+  };
 
   // Fetch all companies
   const fetchCompanies = async () => {
@@ -34,19 +65,18 @@ export default function CompanyPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // NEW: handle file input + preview
+  // File input + preview
   const handleFile = (e) => {
     const file = e.target.files?.[0] || null;
     setFormData((f) => ({ ...f, image: file }));
     setPreview(file ? URL.createObjectURL(file) : null);
   };
 
-  // Create or update company (now supports multipart for image)
+  // Create or update company
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Build FormData for multipart upload
       const data = new FormData();
       Object.entries(formData).forEach(([k, v]) => {
         if (v !== null && v !== "") data.append(k, v);
@@ -82,7 +112,7 @@ export default function CompanyPage() {
     }
   };
 
-  // ✅ Delete company
+  // Delete company
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete?")) return;
 
@@ -95,9 +125,8 @@ export default function CompanyPage() {
     }
   };
 
-  // ✅ Fill form for editing
+  // Fill form for editing
   const handleEdit = (company) => {
-    // Only copy relevant fields (avoid copying id or extra keys)
     setFormData({
       company_name: company.company_name || "",
       incharge_name: company.incharge_name || "",
@@ -105,38 +134,34 @@ export default function CompanyPage() {
       email: company.email || "",
       address: company.address || "",
       country: company.country || "",
-      image: null, // keep null so we don't accidentally send the URL string as a file
+      image: null,
     });
-    // Show current image (if any) in preview; backend may return absolute or /media path
-    setPreview(company.image || null);
+    // ✅ Use normalized URL for existing image
+    setPreview(getImageUrl(company.image) || null);
     setEditingId(company.id);
   };
-
-  // Delete company
 
   const handleKeyDown = (e) => {
     if (e.key !== "Enter") return;
 
-    // Skip if react-select menu is open
     const selectMenuOpen = document.querySelector(".react-select__menu");
     if (selectMenuOpen) return;
 
     e.preventDefault();
 
-    // Select all focusable elements
     const allFocusable = Array.from(
       document.querySelectorAll(
         `input:not([type="hidden"]),
-       select,
-       textarea,
-       button,
-       [tabindex]:not([tabindex="-1"])`
+         select,
+         textarea,
+         button,
+         [tabindex]:not([tabindex="-1"])`
       )
     ).filter(
       (el) =>
-        el.offsetParent !== null && // visible
-        !el.disabled && // not disabled
-        !(el.readOnly === true || el.getAttribute("readonly") !== null) // not readonly
+        el.offsetParent !== null &&
+        !el.disabled &&
+        !(el.readOnly === true || el.getAttribute("readonly") !== null)
     );
 
     const currentIndex = allFocusable.indexOf(e.target);
@@ -224,7 +249,7 @@ export default function CompanyPage() {
               rows={1}
               onChange={handleChange}
               required
-              className="border rounded-sm px-2 py-[3px]  w-full"
+              className="border rounded-sm px-2 py-[3px] w-full"
               onKeyDown={handleKeyDown}
             />
           </div>
@@ -243,7 +268,7 @@ export default function CompanyPage() {
             />
           </div>
 
-          {/* NEW: Brand Logo upload */}
+          {/* Brand Logo upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold mb-1">
               Brand Logo
@@ -297,50 +322,63 @@ export default function CompanyPage() {
             </tr>
           </thead>
           <tbody>
-            {companies.map((c, index) => (
-              <tr key={c.id} className="text-center">
-                <td className="border border-gray-400 px-2 py-1">{index + 1}</td>
-                <td className="border border-gray-400 px-2 py-1">
-                  {c.image ? (
-                    <img
-                      src={c.image}
-                      alt={c.company_name}
-                      className="h-8 w-auto mx-auto rounded"
-                    />
-                  ) : (
-                    <div className="h-8 w-8 rounded bg-gray-200 mx-auto grid place-items-center">
-                      {c.company_name?.[0]}
+            {companies.map((c, index) => {
+              const logo = getImageUrl(c.image);
+              return (
+                <tr key={c.id} className="text-center">
+                  <td className="border border-gray-400 px-2 py-1">
+                    {index + 1}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {logo ? (
+                      <img
+                        src={logo}
+                        alt={c.company_name}
+                        className="h-8 w-auto mx-auto rounded"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded bg-gray-200 mx-auto grid place-items-center">
+                        {c.company_name?.[0]}
+                      </div>
+                    )}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.company_name}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.incharge_name}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.phone_no}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.email}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.address}
+                  </td>
+                  <td className="border border-gray-400 px-2 py-1">
+                    {c.country}
+                  </td>
+                  <td
+                    className="border border-gray-400 px-2 py-1 text-yellow-600 cursor-pointer"
+                    onClick={() => handleEdit(c)}
+                  >
+                    <div className="flex justify-center items-center">
+                      <FaEdit />
                     </div>
-                  )}
-                </td>
-                <td className="border border-gray-400 px-2 py-1">
-                  {c.company_name}
-                </td>
-                <td className="border border-gray-400 px-2 py-1">
-                  {c.incharge_name}
-                </td>
-                <td className="border border-gray-400 px-2 py-1">{c.phone_no}</td>
-                <td className="border border-gray-400 px-2 py-1">{c.email}</td>
-                <td className="border border-gray-400 px-2 py-1">{c.address}</td>
-                <td className="border border-gray-400 px-2 py-1">{c.country}</td>
-                <td
-                  className="border border-gray-400 px-2 py-1 text-yellow-600 cursor-pointer"
-                  onClick={() => handleEdit(c)}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaEdit />
-                  </div>
-                </td>
-                <td
-                  className="border border-gray-400 px-2 py-1 text-red-600 cursor-pointer"
-                  onClick={() => handleDelete(c.id)}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaTrash />
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td
+                    className="border border-gray-400 px-2 py-1 text-red-600 cursor-pointer"
+                    onClick={() => handleDelete(c.id)}
+                  >
+                    <div className="flex justify-center items-center">
+                      <FaTrash />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
