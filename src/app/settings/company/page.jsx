@@ -1,7 +1,7 @@
 "use client";
 
 import AxiosInstance from "@/app/components/AxiosInstance";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function CompanyPage() {
@@ -19,72 +19,41 @@ export default function CompanyPage() {
   const [editingId, setEditingId] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // ✅ Take the origin (host + optional port) from AxiosInstance
-  const apiOrigin = useMemo(() => {
-    const base = AxiosInstance.defaults.baseURL || "";
-
-    if (!base) return "";
-
-    try {
-      const url = new URL(base);
-      return url.origin; // e.g. https://ferozautos.com.bd:8000
-    } catch {
-      // if base is something like "https://ferozautos.com.bd/api/"
-      // and URL ctor fails for some reason, just strip the /api part
-      return base.replace(/\/api\/?$/, "").replace(/\/+$/, "");
-    }
-  }, []);
-
-  // ✅ Build a full URL that always hits the backend origin
-  const getImageUrl = (src) => {
-    if (!src) return null;
-
-    // If backend already returns an absolute URL, just use it
-    if (/^https?:\/\//i.test(src) || src.startsWith("//")) {
-      return src;
-    }
-
-    const path = src.startsWith("/") ? src : `/${src}`;
-
-    // If we know the backend origin, always hit that
-    if (apiOrigin) {
-      return `${apiOrigin}${path}`;
-    }
-
-    // Fallback – previous behaviour
-    return path;
-  };
-
-  // Fetch all companies
+  // Fetch companies from backend
   const fetchCompanies = async () => {
-    const res = await AxiosInstance.get("/companies/");
-    setCompanies(res.data);
-    console.log("Fetched companies:", res.data);
+    try {
+      const res = await AxiosInstance.get("/companies/");
+      setCompanies(res.data);
+      console.log("Fetched companies:", res.data);
+    } catch (err) {
+      console.error("Failed loading companies:", err);
+    }
   };
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
+  // Handle text input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // File input + preview
+  // Handle file upload + preview
   const handleFile = (e) => {
     const file = e.target.files?.[0] || null;
-    setFormData((f) => ({ ...f, image: file }));
+    setFormData((prev) => ({ ...prev, image: file }));
     setPreview(file ? URL.createObjectURL(file) : null);
   };
 
-  // Create or update company (multipart)
+  // Form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const data = new FormData();
-      Object.entries(formData).forEach(([k, v]) => {
-        if (v !== null && v !== "") data.append(k, v);
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== "") data.append(key, value);
       });
 
       if (editingId) {
@@ -108,18 +77,19 @@ export default function CompanyPage() {
         country: "",
         image: null,
       });
+
       setPreview(null);
       setEditingId(null);
       fetchCompanies();
     } catch (error) {
-      console.error("Submission failed:", error);
+      console.error("Submit failed:", error);
       alert("Something went wrong.");
     }
   };
 
   // Delete company
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete?")) return;
+    if (!confirm("Are you sure?")) return;
 
     try {
       await AxiosInstance.delete(`/companies/${id}/`);
@@ -130,7 +100,7 @@ export default function CompanyPage() {
     }
   };
 
-  // Fill form for editing
+  // Edit company (populate form)
   const handleEdit = (company) => {
     setFormData({
       company_name: company.company_name || "",
@@ -142,52 +112,19 @@ export default function CompanyPage() {
       image: null,
     });
 
-    // show current logo from backend in preview (normalized)
-    setPreview(getImageUrl(company.image) || null);
+    // backend already returns correct full/relative URL → use directly
+    setPreview(company.image || null);
     setEditingId(company.id);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key !== "Enter") return;
-
-    const selectMenuOpen = document.querySelector(".react-select__menu");
-    if (selectMenuOpen) return;
-
-    e.preventDefault();
-
-    const allFocusable = Array.from(
-      document.querySelectorAll(
-        `input:not([type="hidden"]),
-         select,
-         textarea,
-         button,
-         [tabindex]:not([tabindex="-1"])`
-      )
-    ).filter(
-      (el) =>
-        el.offsetParent !== null &&
-        !el.disabled &&
-        !(el.readOnly === true || el.getAttribute("readonly") !== null)
-    );
-
-    const currentIndex = allFocusable.indexOf(e.target);
-
-    if (currentIndex !== -1) {
-      for (let i = currentIndex + 1; i < allFocusable.length; i++) {
-        const nextEl = allFocusable[i];
-        nextEl.focus();
-        break;
-      }
-    }
-  };
-
   return (
-    <div className="">
+    <div>
       <h2 className="text-xl font-semibold mb-4">Company Master</h2>
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Company Name:<span className="text-red-600">*</span>
@@ -199,9 +136,9 @@ export default function CompanyPage() {
               onChange={handleChange}
               required
               className="border rounded-sm p-1 w-full"
-              onKeyDown={handleKeyDown}
             />
           </div>
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Incharge Name:<span className="text-red-600">*</span>
@@ -213,9 +150,9 @@ export default function CompanyPage() {
               onChange={handleChange}
               required
               className="border rounded-sm p-1 w-full"
-              onKeyDown={handleKeyDown}
             />
           </div>
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Phone No:<span className="text-red-600">*</span>
@@ -227,9 +164,9 @@ export default function CompanyPage() {
               onChange={handleChange}
               required
               className="border rounded-sm p-1 w-full"
-              onKeyDown={handleKeyDown}
             />
           </div>
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               E-mail ID:<span className="text-red-600">*</span>
@@ -241,26 +178,25 @@ export default function CompanyPage() {
               onChange={handleChange}
               required
               className="border rounded-sm p-1 w-full"
-              onKeyDown={handleKeyDown}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold">
+            <label className="block text-sm font-semibold mb-1">
               Address:<span className="text-red-600">*</span>
             </label>
             <textarea
               name="address"
-              value={formData.address}
               rows={1}
+              value={formData.address}
               onChange={handleChange}
               required
-              className="border rounded-sm px-2 py-[3px]  w-full"
-              onKeyDown={handleKeyDown}
+              className="border rounded-sm px-2 py-[3px] w-full"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-semibold ">
+            <label className="block text-sm font-semibold mb-1">
               Country:<span className="text-red-600">*</span>
             </label>
             <input
@@ -270,43 +206,33 @@ export default function CompanyPage() {
               onChange={handleChange}
               required
               className="border rounded-sm p-1 w-full"
-              onKeyDown={handleKeyDown}
             />
           </div>
 
-          {/* Brand Logo upload */}
+          {/* Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold mb-1">
               Brand Logo
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFile}
-              className="w-full"
-              onKeyDown={handleKeyDown}
-            />
+            <input type="file" accept="image/*" onChange={handleFile} className="w-full" />
+
             {preview && (
               <div className="mt-2">
-                <img
-                  src={preview}
-                  alt="Logo preview"
-                  className="h-14 rounded border"
-                />
+                <img src={preview} alt="Preview" className="h-14 rounded border" />
               </div>
             )}
           </div>
 
-          {/* Button */}
+          {/* Save Button */}
           <div className="col-span-1 flex self-end">
             <button
               type="submit"
-              onKeyDown={handleKeyDown}
               className="bg-blue-950 hover:bg-blue-700 text-white px-2 py-[6px] rounded-md w-1/3 cursor-pointer"
             >
               {editingId ? "Update" : "Save"}
             </button>
           </div>
+
         </div>
       </form>
 
@@ -315,77 +241,62 @@ export default function CompanyPage() {
         <table className="w-full border border-collapse text-sm">
           <thead className="bg-sky-900 text-white">
             <tr>
-              <th className="border border-gray-400 px-2 py-1">SL</th>
-              <th className="border border-gray-400 px-2 py-1">Logo</th>
-              <th className="border border-gray-400 px-2 py-1">Company Name</th>
-              <th className="border border-gray-400 px-2 py-1">Incharge Name</th>
-              <th className="border border-gray-400 px-2 py-1">Phone No</th>
-              <th className="border border-gray-400 px-2 py-1">Email Id</th>
-              <th className="border border-gray-400 px-2 py-1">Address</th>
-              <th className="border border-gray-400 px-2 py-1">Country</th>
-              <th className="border border-gray-400 px-2 py-1">Edit</th>
-              <th className="border border-gray-400 px-2 py-1">Delete</th>
+              <th className="border px-2 py-1">SL</th>
+              <th className="border px-2 py-1">Logo</th>
+              <th className="border px-2 py-1">Company Name</th>
+              <th className="border px-2 py-1">Incharge Name</th>
+              <th className="border px-2 py-1">Phone No</th>
+              <th className="border px-2 py-1">Email</th>
+              <th className="border px-2 py-1">Address</th>
+              <th className="border px-2 py-1">Country</th>
+              <th className="border px-2 py-1">Edit</th>
+              <th className="border px-2 py-1">Delete</th>
             </tr>
           </thead>
+
           <tbody>
-            {companies.map((c, index) => {
-              const logo = getImageUrl(c.image);
-              return (
-                <tr key={c.id} className="text-center">
-                  <td className="border border-gray-400 px-2 py-1">
-                    {index + 1}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {logo ? (
-                      <img
-                        src={logo}
-                        alt={c.company_name}
-                        className="h-8 w-auto mx-auto rounded"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded bg-gray-200 mx-auto grid place-items-center">
-                        {c.company_name?.[0]}
-                      </div>
-                    )}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.company_name}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.incharge_name}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.phone_no}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.email}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.address}
-                  </td>
-                  <td className="border border-gray-400 px-2 py-1">
-                    {c.country}
-                  </td>
-                  <td
-                    className="border border-gray-400 px-2 py-1 text-yellow-600 cursor-pointer"
-                    onClick={() => handleEdit(c)}
-                  >
-                    <div className="flex justify-center items-center">
-                      <FaEdit />
+            {companies.map((c, index) => (
+              <tr key={c.id} className="text-center">
+                <td className="border px-2 py-1">{index + 1}</td>
+
+                <td className="border px-2 py-1">
+                  {c.image ? (
+                    <img
+                      src={c.image}
+                      alt={c.company_name}
+                      className="h-8 w-auto mx-auto rounded"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 bg-gray-200 rounded grid place-items-center">
+                      {c.company_name?.[0]}
                     </div>
-                  </td>
-                  <td
-                    className="border border-gray-400 px-2 py-1 text-red-600 cursor-pointer"
-                    onClick={() => handleDelete(c.id)}
-                  >
-                    <div className="flex justify-center items-center">
-                      <FaTrash />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                  )}
+                </td>
+
+                <td className="border px-2 py-1">{c.company_name}</td>
+                <td className="border px-2 py-1">{c.incharge_name}</td>
+                <td className="border px-2 py-1">{c.phone_no}</td>
+                <td className="border px-2 py-1">{c.email}</td>
+                <td className="border px-2 py-1">{c.address}</td>
+                <td className="border px-2 py-1">{c.country}</td>
+
+                <td
+                  className="border px-2 py-1 text-yellow-600 cursor-pointer"
+                  onClick={() => handleEdit(c)}
+                >
+                  <FaEdit />
+                </td>
+
+                <td
+                  className="border px-2 py-1 text-red-600 cursor-pointer"
+                  onClick={() => handleDelete(c.id)}
+                >
+                  <FaTrash />
+                </td>
+              </tr>
+            ))}
           </tbody>
+
         </table>
       </div>
     </div>
