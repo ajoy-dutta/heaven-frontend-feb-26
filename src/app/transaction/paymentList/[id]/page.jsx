@@ -14,7 +14,7 @@ export default function VoucherPage() {
 
   useEffect(() => {
     if (id) {
-      AxiosInstance.get(`add-expense/${id}/`)
+      AxiosInstance.get(`expense-report/${id}/`)
         .then((res) => {
           console.log(res.data);
           setReceiptData(res.data);

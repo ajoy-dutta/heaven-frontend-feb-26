@@ -21,7 +21,7 @@ const ExpensePage = () => {
   // ✅ Fetch all expenses
   const fetchExpenses = async (params = {}) => {
     try {
-      const res = await AxiosInstance.get("add-expense/", { params });
+      const res = await AxiosInstance.get("expense-report/", { params });
       setExpenses(res.data);
     } catch (err) {
       toast.error("Failed to load expenses");
