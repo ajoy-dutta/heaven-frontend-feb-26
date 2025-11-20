@@ -40,7 +40,7 @@ export default function BrandSaleReport() {
 
     try {
       setLoading(true);
-      const res = await AxiosInstance.get("sales/", {
+      const res = await AxiosInstance.get("sale-report/", {
         params: { company, customer, from_date: fromDate, to_date: toDate },
       });
       console.log("SalesData", res.data);

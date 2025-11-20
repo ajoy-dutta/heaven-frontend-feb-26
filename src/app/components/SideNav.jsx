@@ -25,7 +25,7 @@ export default function SideNavbar({ toggleSidebar }) {
       <div className="flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3 p-2">
           <Image src="/Feroz_logo.jpg" alt="Logo" width={32} height={32} />
-          <span className="text-sm font-semibold">Feroz Autos</span>
+          <span className="text-sm font-semibold">Heaven Autos</span>
         </Link>
       </div>
 

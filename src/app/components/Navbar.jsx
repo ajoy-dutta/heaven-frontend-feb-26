@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 import { FiMail } from "react-icons/fi";
 import { MdHeadsetMic } from "react-icons/md";
-import { IoIosArrowDown } from "react-icons/io";
 import logo from "../assets/Feroz.png";
 import { useUser } from "../provider/UserProvider";
 import Link from "next/link"; // ✅ added
@@ -68,14 +67,14 @@ const Navbar = () => {
             <FiMail className="text-xl" />
             <div>
               <p className="font-medium">Make an Email</p>
-              <p className="text-blue-600 text-xs">info@motorsheba.com</p>
+              <p className="text-blue-600 text-xs">heavenautojessore@gmail.com</p>
             </div>
           </div>
           <div className="flex items-center space-x-2 border-l pl-4">
             <MdHeadsetMic className="text-xl" />
             <div>
               <p className="font-medium">Call Us 24/7</p>
-              <p className="text-blue-600 text-xs">09610-500500</p>
+              <p className="text-blue-600 text-xs">01924-331354</p>
             </div>
           </div>
           <div className="flex items-center space-x-2 border-l pl-4">

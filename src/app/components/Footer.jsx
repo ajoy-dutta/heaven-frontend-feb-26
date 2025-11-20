@@ -65,16 +65,16 @@ export default function Footer() {
                 <li className="flex items-start gap-2">
                   <Phone className="mt-0.5 h-3.5 w-3.5 text-red-400" />
                   <a href="tel:+8801715488288" className="hover:text-red-400">
-                    +880 1715-488-288
+                    +880 1924-331354
                   </a>
                 </li>
                 <li className="flex items-start gap-2">
                   <Mail className="mt-0.5 h-3.5 w-3.5 text-red-400" />
                   <a
-                    href="mailto:support@firozautos.com"
+                    href="mailto:heavenautojessore@gmail.com"
                     className="hover:text-red-400"
                   >
-                    support@firozautos.com
+                    heavenautojessore@gmail.com
                   </a>
                 </li>
               </ul>
@@ -86,7 +86,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="bg-red-700 text-center py-3 font-semibold">
         <p>
-          © {year} <span className="font-bold">Firoz Autos</span>. All rights
+          © {year} <span className="font-bold">Heaven Autos</span>. All rights
           reserved.{" "}
           <span>
             Powered by{" "}

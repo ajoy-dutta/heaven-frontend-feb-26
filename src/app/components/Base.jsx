@@ -23,7 +23,7 @@ export default function Base() {
         {/* TEXT BLOCK */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <div className="text-white text-center px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Feroz Autos</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Heaven Autos</h1>
             <p className="text-lg md:text-xl">Your Trusted Source for Motorcycle Parts & Accessories</p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function Base() {
       {/* Why Choose Us */}
       <section className="bg-pink-50 py-16 px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">Why Firoz Autos?</h2>
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">Why Heaven Autos?</h2>
           <p className="text-lg text-gray-600 mb-10">Trusted by dealers across Bangladesh since 2012.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[

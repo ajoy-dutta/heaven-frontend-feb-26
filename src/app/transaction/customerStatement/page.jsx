@@ -36,7 +36,7 @@ export default function CustomerStatementReport() {
       return;
     }
     try {
-      const res = await AxiosInstance.get("sales/", { params: filters });
+      const res = await AxiosInstance.get("sale-report/", { params: filters });
       setSales(res.data);
       if (res.data.length === 0) toast.info("No sales records found.");
     } catch (error) {
