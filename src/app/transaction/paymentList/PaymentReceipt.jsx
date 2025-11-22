@@ -53,7 +53,7 @@ export default function PayReceipt({ receiptData }) {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold mt-2">Heaven Autos</h1>
+          <h1 className="text-2xl font-bold mt-2">Feroz Autos</h1>
           <p className="text-sm font-semibold">
             Genuine Motorcycle Parts Importer & Wholesaler
           </p>
@@ -64,7 +64,7 @@ export default function PayReceipt({ receiptData }) {
             Phone: 0421-66095, Mob: 01924-331354, 01711-355328, 01778-117515
           </p>
           <p className="text-xs">
-            E-mail: heavenautos77jsr@yahoo.com / heavenautojessore@gmail.com
+            E-mail: support@firozautos.com
           </p>
         </div>
 

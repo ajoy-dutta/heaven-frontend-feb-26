@@ -17,7 +17,7 @@ export const generateReceiptPDF = async (receiptData, voucherType = "Receive") =
     // Company Header
     pdf.setFontSize(20);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('HEAVEN AUTOS', 105, yPosition, { align: 'center' });
+    pdf.text('Feroz AUTOS', 105, yPosition, { align: 'center' });
     yPosition += 8;
 
     pdf.setFontSize(12);
@@ -26,11 +26,11 @@ export const generateReceiptPDF = async (receiptData, voucherType = "Receive") =
     yPosition += 5;
 
     pdf.setFontSize(10);
-    pdf.text('77 R.N. Road, Noldanga Road (Heaven Building), Jashore-7400', 105, yPosition, { align: 'center' });
+    pdf.text('77 R.N. Road, Noldanga Road (Building), Jashore-7400', 105, yPosition, { align: 'center' });
     yPosition += 4;
-    pdf.text('Phone: 0421-66095, Mob: 01924-331354, 01711-355328, 01778-117515', 105, yPosition, { align: 'center' });
+    pdf.text('Phone: 01924-331354, Mob: 01924-331354, 01711-355328, 01778-117515', 105, yPosition, { align: 'center' });
     yPosition += 4;
-    pdf.text('E-mail: heavenautos77jsr@yahoo.com / heavenautojessore@gmail.com', 105, yPosition, { align: 'center' });
+    pdf.text('E-mail: support@firozautos.com', 105, yPosition, { align: 'center' });
     yPosition += 4;
     pdf.text('SUZUKI | YAMAHA | BAJAJ - Authorized Dealer', 105, yPosition, { align: 'center' });
     yPosition += 8;

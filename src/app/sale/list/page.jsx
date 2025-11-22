@@ -918,7 +918,7 @@ export default function SalesList() {
         <table className="table text-sm">
           <thead className="bg-sky-800 text-white">
             <tr>
-              <th className="w-12"></th>
+              <th className="w-10"></th>
               <th className="max-w-[200px]">Customer Details</th>
               <th>Bill No</th>
               <th>Bill Date</th>

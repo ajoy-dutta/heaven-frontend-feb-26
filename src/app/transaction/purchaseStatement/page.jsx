@@ -127,16 +127,17 @@ export default function PurchaseStatementReport() {
             </div>
 
             <div className="text-center border-b border-gray-400 pb-3 mb-6">
-                <h1 className="text-2xl font-bold uppercase tracking-wide text-gray-800">
-                Heaven Autos
-                </h1>
-                <p className="text-sm text-gray-700">
+              <h1 className="text-2xl font-bold uppercase tracking-wide text-gray-800">
+                Feroz Autos
+              </h1>
+              <p className="text-sm text-gray-700">
                 Genuine Motorcycle Parts Importer & Wholesaler
-                </p>
-                <p className="text-sm text-gray-600">
-                77 R.N. Road, Noldanga Road (Heaven Building), Jashore-7400 <br />
-                Phone: 0421-66095, Mob: 01924-331354 | Email: heavenautos77jsr@yahoo.com
-                </p>
+              </p>
+              <p className="text-sm text-gray-600">
+                77 R.N. Road, Noldanga Road ( Building), Jashore-7400 <br />
+                Phone: 09610-500500, Mob: 01924-331354 | Email:
+                support@firozautos.com
+              </p>
             </div>
 
           <div className="mb-4 text-sm text-gray-700">

@@ -16,13 +16,13 @@ export const handleDownloadPDF = (sales, filters, totalSales, totalPaid, totalDu
   // ====== HEADER SECTION ======
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text("Heaven Autos", pageWidth / 2, 40, { align: "center" });
+  doc.text("Feroz Autos", pageWidth / 2, 40, { align: "center" });
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.text("Genuine Motorcycle Parts Importer & Wholesaler", pageWidth / 2, 55, { align: "center" });
-  doc.text("77 R.N. Road, Noldanga Road (Heaven Building), Jashore-7400", pageWidth / 2, 68, { align: "center" });
-  doc.text("Phone: 0421-66095, Mob: 01924-331354 | Email: heavenautos77jsr@yahoo.com", pageWidth / 2, 81, { align: "center" });
+  doc.text("77 R.N. Road, Noldanga Road (Building), Jashore-7400", pageWidth / 2, 68, { align: "center" });
+  doc.text("Phone: 0421-66095, Mob: 01924-331354 | Email: support@firozautos.com", pageWidth / 2, 81, { align: "center" });
 
   doc.setLineWidth(0.5);
   doc.line(40, 90, pageWidth - 40, 90);
