@@ -70,6 +70,10 @@ export default function EmployeeList() {
     setFilteredList(filtered);
   };
 
+  const handleEdit = (id) => {
+    router.push(`addemployee/${id}`);
+  }
+
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this employee?")) return;
 
@@ -185,7 +189,10 @@ export default function EmployeeList() {
                   />
                 </td>
                 <td className="border border-slate-300 py-1 px-2">
-                  <FaEdit className="text-yellow-600 mx-auto cursor-pointer" />
+                  <FaEdit 
+                    onClick={() => handleEdit(emp.id)}
+                    className="text-yellow-600 mx-auto cursor-pointer" 
+                  />
                 </td>
                 <td className="border border-slate-300 py-1 px-2">
                   <FaTrash

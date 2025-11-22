@@ -1,10 +1,13 @@
 "use client";
 
 import AxiosInstance from "@/app/components/AxiosInstance";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 export default function EmployeeForm() {
   const [education, setEducation] = useState([]);
+  const params = useParams();
+  const { id } = params;
   const [eduInput, setEduInput] = useState({
     exam: "",
     institute: "",
@@ -13,6 +16,7 @@ export default function EmployeeForm() {
     gpa: "",
     board: "",
   });
+  
 
   const [formData, setFormData] = useState({
     employee_name: "",
@@ -55,6 +59,25 @@ export default function EmployeeForm() {
     reference_mobile: "",
     reference_address: "",
   });
+
+
+  useEffect(() => {
+    if (id) {
+      // Fetch existing employee data for editing
+      const fetchEmployee = async () => {
+        try {
+          const res = await AxiosInstance.get(`/employees/${id}/`);
+          const empData = res.data;
+        }
+        catch (error) {
+          console.error("Failed to fetch employee data", error);
+        }
+      };
+      fetchEmployee();
+    }
+  }, [id]);
+          
+            
 
   // ✅ General input change
   const handleChange = (e) => {
