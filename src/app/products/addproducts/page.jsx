@@ -287,7 +287,7 @@ export default function ProductEntryForm() {
             >
               <option value="">--Select--</option>
               {companyList.map((company) => (
-                <option key={company.id} value={company.id}>
+                <option key={company.id} value={company.company_name}>
                   {company.company_name}
                 </option>
               ))}
@@ -386,49 +386,12 @@ export default function ProductEntryForm() {
           </div>
 
           <div>
-            <label className="block ">Net Weight:</label>
-            <input
-              name="net_weight"
-              type="text"
-              value={formData.net_weight || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
             <label className="block ">MRP:</label>
             <input
               name="product_mrp"
               value={formData.product_mrp || ""}
               type="text"
               onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
-            <label className="block ">Percentage:</label>
-            <input
-              name="percentage"
-              value={formData.percentage}
-              type="text"
-              onChange={handleChange || ""}
-              className="w-full border rounded px-2 py-1"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
-            <label className="block ">BDT:</label>
-            <input
-              name="product_bdt"
-              type="text"
-              onChange={handleChange}
-              value={formData.product_bdt || ""}
-              readOnly
               className="w-full border rounded px-2 py-1"
               onKeyDown={handleKeyDown}
             />
@@ -446,22 +409,6 @@ export default function ProductEntryForm() {
               onKeyDown={handleKeyDown}
             />
           </div>
-
-          {/* <div>
-            <label className="block ">
-              HS Code:<span className="text-red-600">*</span>
-            </label>
-            <input
-              name="hs_code"
-              type="text"
-              placeholder="HS Code"
-              value={formData.hs_code || ""}
-              required
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              onKeyDown={handleKeyDown}
-            />
-          </div> */}
 
         </div>
 

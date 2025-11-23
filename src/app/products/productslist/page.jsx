@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
-  const [rawResponse, setRawResponse] = useState(null);  // for debugging
   const [filterCompany, setFilterCompany] = useState("");
   const [filterPartNo, setFilterPartNo] = useState("");
   const [filterProduct, setFilterProduct] = useState("");
@@ -15,25 +14,22 @@ export default function ProductList() {
   const itemsPerPage = 30;
   const router = useRouter();
 
-  // Fetch products from the API
+  // Fetch products
   const fetchProducts = async () => {
     try {
       const response = await AxiosInstance.get("products/");
       console.log("Fetched response:", response.data);
-      setRawResponse(response.data);
 
-      // Handle paginated or unpaginated response
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else if (response.data?.results) {
         setProducts(response.data.results);
       } else {
-        console.error("Unexpected API response:", response.data);
         setProducts([]);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      alert("Error fetching products. Check console for details.");
+      alert("Error fetching products. Check console.");
     }
   };
 
@@ -45,14 +41,18 @@ export default function ProductList() {
     setCurrentPage(1);
   }, [filterCompany, filterPartNo, filterProduct]);
 
-  // Filtering
+  // Filtering Logic (SAFE)
   const filteredProducts = products.filter((item) => {
+    const companyId = item.category_detail?.company_detail?.id;
+
     const matchCompany = filterCompany
-      ? item.category_detail.company_detail.id.toString() === filterCompany
+      ? companyId?.toString() === filterCompany
       : true;
+
     const matchPartNo = filterPartNo
       ? item.part_no?.toLowerCase().includes(filterPartNo.toLowerCase())
       : true;
+
     const matchProduct = filterProduct
       ? item.id.toString() === filterProduct
       : true;
@@ -82,7 +82,7 @@ export default function ProductList() {
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error deleting product. Check console for details.");
+      alert("Error deleting product. Check console.");
     }
   };
 
@@ -92,23 +92,28 @@ export default function ProductList() {
         Product List
       </h1>
 
-
-      {/* Filter Form */}
+      {/* Filter Section */}
       <div className="mt-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Company Filter */}
         <select
           className="w-full border border-gray-300 rounded-sm px-4 py-[6px]"
           value={filterCompany}
           onChange={(e) => setFilterCompany(e.target.value)}
         >
           <option value="">--Select Company--</option>
+
           {[
             ...new Set(
-              products.map((p) => p.category_detail.company_detail.id)
+              products
+                .map((p) => p.category_detail?.company_detail?.id)
+                .filter((id) => id !== null && id !== undefined)
             ),
           ].map((id) => {
-            const name = products.find(
-              (p) => p.category_detail.company_detail.id === id
-            )?.category_detail.company_detail.company_name;
+            const name =
+              products.find(
+                (p) => p.category_detail?.company_detail?.id === id
+              )?.category_detail?.company_detail?.company_name || "Unknown";
+
             return (
               <option key={id} value={id}>
                 {name}
@@ -117,6 +122,7 @@ export default function ProductList() {
           })}
         </select>
 
+        {/* Part No Filter */}
         <input
           type="text"
           placeholder="Part No"
@@ -125,6 +131,7 @@ export default function ProductList() {
           className="w-full border border-gray-300 rounded-sm px-4 py-1"
         />
 
+        {/* Product Filter */}
         <select
           className="w-full border border-gray-300 rounded-sm px-4 py-[6px]"
           value={filterProduct}
@@ -138,8 +145,11 @@ export default function ProductList() {
           ))}
         </select>
 
+        {/* Excel Export */}
         <button
-          onClick={() => alert("Export to Excel functionality not implemented yet.")}
+          onClick={() =>
+            alert("Export to Excel functionality not implemented yet.")
+          }
           className="w-1/2 text-sm bg-emerald-600 text-white rounded-sm px-4 py-[6px]"
         >
           Export To Excel
@@ -156,24 +166,20 @@ export default function ProductList() {
               <th className="p-2 border border-slate-400">Company</th>
               <th className="p-2 border border-slate-400">Part No</th>
               <th className="p-2 border border-slate-400">Product Name</th>
-              <th className="p-2 border border-slate-400">Code</th>
               <th className="p-2 border border-slate-400">Brand</th>
               <th className="p-2 border border-slate-400">Model</th>
               <th className="p-2 border border-slate-400">MRP</th>
-              <th className="p-2 border border-slate-400">Percentage</th>
-              <th className="p-2 border border-slate-400">BDT</th>
-              <th className="p-2 border border-slate-400">Weight</th>
-              <th className="p-2 border border-slate-400">HS Code</th>
-              <th className="p-2 border border-slate-400">Entry By</th>
               <th className="p-2 border border-slate-400">Remarks</th>
               <th className="p-2 border border-slate-400">Edit</th>
               <th className="p-2 border border-slate-400">Delete</th>
             </tr>
           </thead>
+
           <tbody>
             {currentItems.map((item, idx) => (
               <tr key={item.id} className="border text-center border-slate-400">
                 <td className="p-2 border border-slate-400">{idx + 1}</td>
+
                 <td className="p-2 border border-slate-400">
                   <img
                     src={item.image || "/no-image.png"}
@@ -181,21 +187,18 @@ export default function ProductList() {
                     className="w-12 h-10 object-cover border border-slate-400"
                   />
                 </td>
+
                 <td className="p-2 border border-slate-400">
-                  {item.category_detail?.company_detail?.company_name || "N/A"}
+                  {item.company || "N/A"}
                 </td>
+
                 <td className="p-2 border border-slate-400">{item.part_no}</td>
                 <td className="p-2 border border-slate-400">{item.product_name}</td>
-                <td className="p-2 border border-slate-400">{item.product_code}</td>
                 <td className="p-2 border border-slate-400">{item.brand_name}</td>
                 <td className="p-2 border border-slate-400">{item.model_no}</td>
                 <td className="p-2 border border-slate-400">৳{item.product_mrp}</td>
-                <td className="p-2 border border-slate-400">৳{item.percentage}</td>
-                <td className="p-2 border border-slate-400">৳{item.product_bdt}</td>
-                <td className="p-2 border border-slate-400">{item.net_weight}</td>
-                <td className="p-2 border border-slate-400">{item.hs_code}</td>
-                <td className="p-2 border border-slate-400">{item.entryBy || "Admin"}</td>
-                  <td className="p-2 border border-slate-400">{item.remarks}</td>
+                <td className="p-2 border border-slate-400">{item.remarks}</td>
+
                 <td
                   className="p-2 text-lg border border-slate-400 text-blue-600 cursor-pointer hover:text-blue-800"
                   onClick={() => handleEdit(item.id)}
@@ -203,6 +206,7 @@ export default function ProductList() {
                 >
                   <MdModeEdit />
                 </td>
+
                 <td
                   className="p-2 text-lg border border-slate-400 text-red-600 cursor-pointer hover:text-red-800"
                   onClick={() => handleDelete(item.id)}
@@ -216,6 +220,7 @@ export default function ProductList() {
         </table>
       </div>
 
+      {/* Pagination */}
       <div className="flex justify-center mt-4 gap-2">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

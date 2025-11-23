@@ -5,7 +5,6 @@ import Select from "react-select";
 import axiosInstance from "../components/AxiosInstance";
 import { toast } from "react-hot-toast";
 import { useRef } from "react";
-import StockList from "../stock/list/page";
 
 export default function CustomerProductSale() {
   // Custom styles for react-select with vertical centering
@@ -1025,16 +1024,31 @@ export default function CustomerProductSale() {
 
             <div className="flex items-end">
               <button
-                className="px-4 py-2 text-sm text-white rounded bg-sky-800 hover:bg-sky-700"
+                className="
+                  px-4 py-2 text-sm text-white rounded 
+                  bg-sky-800 
+                  hover:bg-sky-700
+                  focus:bg-green-700     /* When button is focused */
+                  focus:ring-2 
+                  focus:ring-green-400 
+                  focus:outline-none
+                "
+                tabIndex="0"
                 onClick={(e) => {
                   e.preventDefault();
                   addProduct();
                 }}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addProduct();
+                  }
+                }}
               >
                 Add Product
               </button>
             </div>
+
           </div>
         </section>
 
@@ -1250,17 +1264,34 @@ export default function CustomerProductSale() {
             />
           </div>
 
-          {/* Add Button */}
-          <div className="flex items-end justify-end">
-            <button
-              type="button"
-              onClick={handleAddPayment}
-              className="px-4 py-2 bg-sky-800 text-sm text-white rounded hover:bg-sky-700"
-              onKeyDown={handleKeyDown}
-            >
-              Add
-            </button>
+          <div className="flex items-end">
+              <button
+                className="
+                  px-4 py-2 text-sm text-white rounded 
+                  bg-sky-800 
+                  hover:bg-sky-700
+                  focus:bg-green-700     /* When button is focused */
+                  focus:ring-2 
+                  focus:ring-green-400 
+                  focus:outline-none
+                "
+                tabIndex="0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddPayment();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddPayment();
+                  }
+                }}
+              >
+                Add
+              </button>
           </div>
+
+
         </div>
       </div>
 

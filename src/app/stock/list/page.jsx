@@ -284,7 +284,7 @@ const handleDamageSave = async () => {
             {currentStocks.map((stock, index) => (
               <tr key={stock.id} className="h-12">
                 <td className="text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="text-center">{stock.product?.category_detail?.company_detail?.company_name || "N/A"}</td>
+                <td className="text-center">{stock.company_name || "N/A"}</td>
                 <td className="text-center">{stock.part_no || "N/A"}</td>
                 <td className="text-center">{stock.product?.product_name || "N/A"}</td>
                 <td className="text-center">{stock.product?.model_no || "N/A"}</td>

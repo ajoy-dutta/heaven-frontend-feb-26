@@ -7,11 +7,11 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 export default function CompanyPage() {
   const [formData, setFormData] = useState({
     company_name: "",
-    incharge_name: "",
-    phone_no: "",
-    email: "",
-    address: "",
-    country: "",
+    // incharge_name: "",
+    // phone_no: "",
+    // email: "",
+    // address: "",
+    // country: "",
     image: null,
   });
 
@@ -70,11 +70,11 @@ export default function CompanyPage() {
 
       setFormData({
         company_name: "",
-        incharge_name: "",
-        phone_no: "",
-        email: "",
-        address: "",
-        country: "",
+        // incharge_name: "",
+        // phone_no: "",
+        // email: "",
+        // address: "",
+        // country: "",
         image: null,
       });
 
@@ -104,11 +104,11 @@ export default function CompanyPage() {
   const handleEdit = (company) => {
     setFormData({
       company_name: company.company_name || "",
-      incharge_name: company.incharge_name || "",
-      phone_no: company.phone_no || "",
-      email: company.email || "",
-      address: company.address || "",
-      country: company.country || "",
+      // incharge_name: company.incharge_name || "",
+      // phone_no: company.phone_no || "",
+      // email: company.email || "",
+      // address: company.address || "",
+      // country: company.country || "",
       image: null,
     });
 
@@ -139,7 +139,7 @@ export default function CompanyPage() {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold mb-1">
               Incharge Name:<span className="text-red-600">*</span>
             </label>
@@ -207,7 +207,7 @@ export default function CompanyPage() {
               required
               className="border rounded-sm p-1 w-full"
             />
-          </div>
+          </div> */}
 
           {/* Image Upload */}
           <div className="md:col-span-2">
@@ -241,14 +241,14 @@ export default function CompanyPage() {
         <table className="w-full border border-collapse text-sm">
           <thead className="bg-sky-900 text-white">
             <tr>
-              <th className="border px-2 py-1">SL</th>
+              <th className="border px-2 py-1 w-20">SL</th>
               <th className="border px-2 py-1">Logo</th>
               <th className="border px-2 py-1">Company Name</th>
-              <th className="border px-2 py-1">Incharge Name</th>
+              {/* <th className="border px-2 py-1">Incharge Name</th>
               <th className="border px-2 py-1">Phone No</th>
               <th className="border px-2 py-1">Email</th>
               <th className="border px-2 py-1">Address</th>
-              <th className="border px-2 py-1">Country</th>
+              <th className="border px-2 py-1">Country</th> */}
               <th className="border px-2 py-1">Edit</th>
               <th className="border px-2 py-1">Delete</th>
             </tr>
@@ -257,7 +257,7 @@ export default function CompanyPage() {
           <tbody>
             {companies.map((c, index) => (
               <tr key={c.id} className="text-center">
-                <td className="border px-2 py-1">{index + 1}</td>
+                <td className="border px-2 py-1 w-20">{index + 1}</td>
 
                 <td className="border px-2 py-1">
                   {c.image ? (
@@ -274,11 +274,11 @@ export default function CompanyPage() {
                 </td>
 
                 <td className="border px-2 py-1">{c.company_name}</td>
-                <td className="border px-2 py-1">{c.incharge_name}</td>
+                {/* <td className="border px-2 py-1">{c.incharge_name}</td>
                 <td className="border px-2 py-1">{c.phone_no}</td>
                 <td className="border px-2 py-1">{c.email}</td>
                 <td className="border px-2 py-1">{c.address}</td>
-                <td className="border px-2 py-1">{c.country}</td>
+                <td className="border px-2 py-1">{c.country}</td> */}
 
                 <td
                   className="border px-2 py-1 text-yellow-600 cursor-pointer"
