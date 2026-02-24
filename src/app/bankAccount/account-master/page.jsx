@@ -298,7 +298,7 @@ export default function AccountMaster() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                  className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400" 
                 >
                   Cancel
                 </button>

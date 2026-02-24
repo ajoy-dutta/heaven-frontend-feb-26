@@ -23,7 +23,7 @@ export default function Base() {
         {/* TEXT BLOCK */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <div className="text-white text-center px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Feroz Autos</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Heaven Autos</h1>
             <p className="text-lg md:text-xl">Your Trusted Source for Motorcycle Parts & Accessories</p>
           </div>
         </div>

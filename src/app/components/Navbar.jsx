@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FaSearch,
   FaShoppingCart,
@@ -11,229 +11,210 @@ import {
 } from "react-icons/fa";
 import { FiMail } from "react-icons/fi";
 import { MdHeadsetMic } from "react-icons/md";
-import logo from "../assets/Feroz.png";
+import logo from "../assets/Heaven_logo.png";
 import { useUser } from "../provider/UserProvider";
-import Link from "next/link"; // ✅ added
-import { useCart } from "@/app/context/CartContext"; // ✅ added
+import Link from "next/link";
+import { useCart } from "@/app/context/CartContext";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const { signOut } = useUser();
-  const { cart } = useCart(); // ✅ get cart from context
-  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0); // ✅ count total qty
+  const { cart } = useCart();
+
+  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
   const user =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
   const isAuthenticated =
     user !== null && user !== undefined && user !== "null";
 
   const handleSignOut = () => {
     signOut();
-    Router.push("/");
+    router.push("/");
   };
-  const activeClass = "text-green-600 font-semibold";
+
+  const navButton =
+    "px-4 py-1.5 rounded-md border transition-all duration-300 text-sm font-semibold";
+
+  const activeButton =
+    "bg-green-600 text-white border-green-600 shadow-sm";
+
+  const inactiveButton =
+    "bg-white text-gray-700 border-transparent hover:border-green-500 hover:text-green-600 hover:bg-green-50";
 
   return (
-    <div className="border-b bg-[#FAFBFC] fixed top-0 left-0 w-full z-50 shadow-md">
-      {/* Top Bar */}
-      <div className="flex flex-col lg:flex-row items-center justify-between px-4 lg:px-6 bg-white">
+    <div className="border-b bg-[#fafafc] fixed top-0 left-0 w-full z-50 shadow-sm">
+      
+      {/* ================= Top Bar ================= */}
+      <div className="flex flex-col lg:flex-row items-center justify-between px-4 lg:px-6 bg-[#bcdff0]">
+
+        {/* Logo + Mobile Toggle */}
         <div className="flex items-center w-full justify-between lg:w-auto">
-          <img src={logo.src} alt="Motor Sheba" className="w-24" />
+          <Link href="/">
+            <img
+              src={logo.src}
+              alt="Heaven Auto"
+              className="w-24 object-contain"
+            />
+          </Link>
+
           <button
-            className="lg:hidden text-xl"
+            className="lg:hidden text-xl text-gray-700"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
 
-        {/* Search Box */}
+        {/* Search */}
         <div className="hidden lg:flex relative w-full lg:w-96 my-1">
           <input
             type="text"
-            placeholder="I am searching for..."
-            className="border rounded-md px-4 py-2 w-full text-sm focus:outline-none"
+            placeholder="Search products..."
+            className="border rounded-md px-4 py-2 w-full text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
           />
-          <button className="absolute right-2 top-2.5 text-gray-600">
+          <button className="absolute right-3 top-2.5 text-gray-500 hover:text-green-600 transition">
             <FaSearch />
           </button>
         </div>
 
-        {/* Contact/Account/Cart */}
-        <div className="hidden lg:flex flex-wrap justify-center gap-6 text-sm">
-          <div className="flex items-center space-x-2">
-            <FiMail className="text-xl" />
-            <div>
-              <p className="font-medium">Make an Email</p>
-              <p className="text-blue-600 text-xs">heavenautojessore@gmail.com</p>
-            </div>
+        {/* Right Section */}
+        <div className="hidden lg:flex items-center gap-6 text-sm">
+
+          <div className="flex items-center gap-2 text-gray-600">
+            <FiMail className="text-lg" />
+            <span className="text-xs">heavenautojessore@gmail.com</span>
           </div>
-          <div className="flex items-center space-x-2 border-l pl-4">
-            <MdHeadsetMic className="text-xl" />
-            <div>
-              <p className="font-medium">Call Us 24/7</p>
-              <p className="text-blue-600 text-xs">01924-331354</p>
-            </div>
+
+          <div className="flex items-center gap-2 border-l pl-4 text-gray-600">
+            <MdHeadsetMic className="text-lg" />
+            <span className="text-xs">01924-331354</span>
           </div>
-          <div className="flex items-center space-x-2 border-l pl-4">
-            <FaUser />
-            <div className="flex flex-col text-xs">
-              <span className="text-gray-600 font-medium">Your Account</span>
-              <div className="flex space-x-2">
+
+          {/* Account */}
+          <div className="relative border-l pl-4">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2 hover:text-green-600 transition text-gray-700"
+            >
+              <FaUser />
+              <span className="text-xs font-medium">Account</span>
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border shadow-md rounded-2xltext-xs">
                 {isAuthenticated ? (
-                  <button
-                    onClick={handleSignOut}
-                    className="cursor-pointer hover:underline text-red-600"
-                  >
-                    Sign Out
-                  </button>
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="block px-3 py-2 hover:bg-green-500"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-3 py-2 text-red-600 hover:bg-gray-100"
+                    >
+                      Sign Out
+                    </button>
+                  </>
                 ) : (
-                  <a
+                  <Link
                     href="/authentication"
-                    className="cursor-pointer hover:underline"
+                    className="block px-3 py-2 hover:bg-gray-100"
                   >
-                    Login or Register
-                  </a>
+                    Login / Register
+                  </Link>
                 )}
               </div>
-            </div>
+            )}
           </div>
+
+          {/* Cart */}
+          <Link href="/cart" className="relative border-l pl-4">
+            <FaShoppingCart className="text-lg hover:text-green-600 transition" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 text-[10px] bg-red-600 text-white rounded-full h-4 w-4 flex items-center justify-center font-semibold">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
-      {/* Desktop Menu */}
-      <div className="hidden lg:flex items-center justify-center gap-6 px-6 py-1 bg-[#FAFBFC] text-sm font-semibold">
-        <a
+      {/* ================= Desktop Menu (Boxy Animated) ================= */}
+      <div className="hidden lg:flex items-center justify-center gap-4 px-6 py-1 bg-[#FAFBFC]">
+
+        <Link
           href="/"
-          className={`hover:text-blue-600 ${
-            pathname === "/" ? activeClass : ""
+          className={`${navButton} ${
+            pathname === "/" ? activeButton : inactiveButton
           }`}
         >
           Home
-        </a>
-        <a
+        </Link>
+
+        <Link
           href="/brands"
-          className={`hover:text-blue-600 ${
-            pathname === "/brands" ? activeClass : ""
+          className={`${navButton} ${
+            pathname === "/brands" ? activeButton : inactiveButton
           }`}
         >
           Brands
-        </a>
-        <a
+        </Link>
+
+        <Link
           href="/accessories"
-          className={`hover:text-blue-600 ${
-            pathname === "/accessories" ? activeClass : ""
+          className={`${navButton} ${
+            pathname === "/accessories" ? activeButton : inactiveButton
           }`}
         >
           Accessories
-        </a>
-        <a
-          href="/how-to-order"
-          className={`hover:text-blue-600 ${
-            pathname === "/how-to-order" ? activeClass : ""
-          }`}
-        >
-          How to order
-        </a>
-        <a
-          href="/contact"
-          className={`hover:text-blue-600 ${
-            pathname === "/contact" ? activeClass : ""
-          }`}
-        >
-          Contact Us
-        </a>
+        </Link>
 
-        {/* Dashboard */}
+        <Link
+          href="/how-to-order"
+          className={`${navButton} ${
+            pathname === "/how-to-order" ? activeButton : inactiveButton
+          }`}
+        >
+          How to Order
+        </Link>
+
+        <Link
+          href="/contact"
+          className={`${navButton} ${
+            pathname === "/contact" ? activeButton : inactiveButton
+          }`}
+        >
+          Contact
+        </Link>
+
         {isAuthenticated && (
-          <a
+          <Link
             href="/dashboard"
-            className={`hover:text-blue-600 ${
-              pathname === "/dashboard" ? activeClass : ""
+            className={`${navButton} ${
+              pathname === "/dashboard" ? activeButton : inactiveButton
             }`}
           >
             Dashboard
-          </a>
+          </Link>
         )}
-
-        {/* ✅ Cart (now live count + clickable) */}
-        <Link href="/cart" className="relative text-center text-xs">
-          <FaShoppingCart className="mx-auto text-xl" />
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 text-[10px] bg-red-600 text-white rounded-full h-4 w-4 flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-          <div>Cart</div>
-        </Link>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ================= Mobile Menu ================= */}
       {mobileMenuOpen && (
         <div className="lg:hidden flex flex-col px-4 space-y-2 pb-4 text-sm font-medium bg-white border-t">
-          <a href="/" className={pathname === "/" ? activeClass : ""}>
-            Home
-          </a>
-          <a
-            href="/brands"
-            className={pathname === "/brands" ? activeClass : ""}
-          >
-            Brands
-          </a>
-          <a
-            href="/accessories"
-            className={pathname === "/accessories" ? activeClass : ""}
-          >
-            Accessories
-          </a>
-          <a
-            href="/how-to-order"
-            className={pathname === "/how-to-order" ? activeClass : ""}
-          >
-            How to order
-          </a>
-          <a
-            href="/contact"
-            className={pathname === "/contact" ? activeClass : ""}
-          >
-            Contact Us
-          </a>
-
-          {isAuthenticated ? (
-            <>
-              <a
-                href="/dashboard"
-                className={pathname === "/dashboard" ? activeClass : ""}
-              >
-                Dashboard
-              </a>
-              <button
-                onClick={handleSignOut}
-                className="text-left text-red-600"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <a
-              href="/authentication"
-              className={pathname === "/authentication" ? activeClass : ""}
-            >
-              Login or Register
-            </a>
-          )}
-
-          {/* ✅ Cart for mobile */}
-          <Link
-            href="/cart"
-            className="flex items-center gap-2 mt-2 text-gray-700"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <FaShoppingCart />
-            <span>Cart ({cartCount})</span>
-          </Link>
+          <Link href="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+          <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
+          <Link href="/accessories" onClick={() => setMobileMenuOpen(false)}>Accessories</Link>
+          <Link href="/how-to-order" onClick={() => setMobileMenuOpen(false)}>How to Order</Link>
+          <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
         </div>
       )}
     </div>

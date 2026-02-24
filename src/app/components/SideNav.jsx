@@ -1,5 +1,5 @@
 "use client";
-
+import HeavenLogo from "../assets/Heaven_logo.png";
 import React from "react";
 import Link from "next/link";
 import { useUser } from "../provider/UserProvider";
@@ -24,7 +24,7 @@ export default function SideNavbar({ toggleSidebar }) {
       {/* Left: Sidebar Toggle + Logo */}
       <div className="flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3 p-2">
-          <Image src="/Feroz_logo.jpg" alt="Logo" width={32} height={32} />
+          <Image src={HeavenLogo} alt="Logo" width={32} height={32} />
           <span className="text-sm font-semibold">Heaven Autos</span>
         </Link>
       </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FiLogIn } from "react-icons/fi";
+import heavenLogo from "../../../public/Heaven_logo.png";
 
 export default function NavbarWithDropdown() {
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
@@ -196,7 +197,7 @@ export default function NavbarWithDropdown() {
     >
       <div className="flex items-center justify-between px-8 py-2">
         <Link href="/" className="text-2xl font-semibold">
-          <Image src="/mmLogo.png" alt="Logo" width={50} height={50} />
+          <Image src={heavenLogo} alt="Logo" width={50} height={50} />
         </Link>
 
 
